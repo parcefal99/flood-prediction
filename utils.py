@@ -35,7 +35,7 @@ def extractROI(asset_folder: str)->List[ee.Geometry]:
 
 
 
-DIR_PATH = './shapefiles'
+DIR_PATH = '../shapefiles'
 PROJECT_ID = 'virtual-rarity-426212-p6'
 
 
@@ -81,12 +81,14 @@ def upload_to_gee(gcs_uri, asset_id):
 
 
 # Upload zipfiles from the bucket in GCS to GEE
-bucket_name = 'zipped-shapefiles'
+def run_upload():
+    
+    bucket_name = 'zipped-shapefiles'
 
-for zip_file in os.listdir('./shapefiles/zipped_files'):
-    if zip_file.endswith('.zip'):
-        gcs_uri = f'gs://{bucket_name}/{zip_file}'
-        asset_id = f'projects/virtual-rarity-426212-p6/assets/shapefiles/{os.path.splitext(zip_file)[0]}'
-        upload_to_gee(gcs_uri, asset_id)
-        
-        time.sleep(5)
+    for zip_file in os.listdir('../shapefiles/zipped_files'):
+        if zip_file.endswith('.zip'):
+            gcs_uri = f'gs://{bucket_name}/{zip_file}'
+            asset_id = f'projects/virtual-rarity-426212-p6/assets/shapefiles/{os.path.splitext(zip_file)[0]}'
+            upload_to_gee(gcs_uri, asset_id)
+            
+            time.sleep(5)
