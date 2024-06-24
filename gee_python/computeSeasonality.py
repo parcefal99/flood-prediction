@@ -179,7 +179,6 @@ class PrcpSeasonality():
                         "P_mean": P_mean, "d_P": d_P, "s_P": s_P}
         
         # Save calculations and graphs into the log folder
-        # Save calculations and graphs into the log folder
         if output_logs:
             os.makedirs("./output_logs", exist_ok=True)
             log = pd.DataFrame(data={**optim_params, "p_seasonality": [prcp_seasonality]}, index=[basin_name])
