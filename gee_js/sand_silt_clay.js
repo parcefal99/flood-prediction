@@ -10,6 +10,7 @@ var basinAssets = [
   // 5. Fraction of clay in the soil. %
   function calculate_soil_attributes(basinAsset){
     var basin = ee.FeatureCollection(basinAsset);
+    var basinGeometry = basin.geometry();
     // clip SoilGrids data to my basin
     var sand_basin = isric_sand.clip(basin);
     var silt_basin = isric_silt.clip(basin);
@@ -22,17 +23,17 @@ var basinAssets = [
     // mean values (cm)
     var sand_mean = sand_percent.reduceRegion({
       reducer: ee.Reducer.mean(),
-      geometry: basin,
+      geometry: basinGeometry,
       scale: 250
     })
     var silt_mean = silt_percent.reduceRegion({
       reducer: ee.Reducer.mean(),
-      geometry: basin,
+      geometry: basinGeometry,
       scale: 250
     }) 
     var clay_mean = clay_percent.reduceRegion({
       reducer: ee.Reducer.mean(),
-      geometry: basin,
+      geometry: basinGeometry,
       scale: 250
     })
     // final mean value for each
@@ -62,15 +63,14 @@ var basinAssets = [
       .divide(6));
       
     return ee.Feature(null, {
-      'Basin_ID': basinAsset,
-      'Sand': sand_mean_value,
-      'Silt': silt_mean_value,
-      'Clay': clay_mean_value
+      'basin_id': basinAsset,
+      'sand_frac': sand_mean_value,
+      'silt_frac': silt_mean_value,
+      'clay_frac': clay_mean_value
     });
   }
   
   var elevationResults = basinAssets.map(function(basinAsset) {
-    print(calculate_soil_attributes(basinAsset));
     return calculate_soil_attributes(basinAsset);
   });
   
@@ -81,5 +81,5 @@ var basinAssets = [
     collection: elevationFeatureCollection,
     description: 'SandSiltClayFraction',
     fileFormat: 'CSV',
-    selectors: ['Basin_ID', 'Sand', 'Silt', 'Clay']
+    selectors: ['basin_id', 'sand_frac', 'silt_frac', 'clay_frac']
   });

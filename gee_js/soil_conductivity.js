@@ -7,7 +7,6 @@ var calculateHydraulicConductivity = function(basinAsset) {
   var basin = ee.FeatureCollection(basinAsset);
   var basinGeometry = basin.geometry();
   var ksatImage = ksat.first();
-  // scale factor
   var scaleFactor = 0.0001;
   // apply the scale factor to convert raw values to cm/d
   var ksatImageScaled = ksatImage.multiply(scaleFactor);
@@ -21,8 +20,8 @@ var calculateHydraulicConductivity = function(basinAsset) {
   // cm/day to cm/hr
   var ksatMeanCmPerHr = ee.Number(meanKsat.get('b1')).divide(24);
   return ee.Feature(null, {
-    'Basin_ID': basinAsset,
-    'Hydraulic_conductivity': ksatMeanCmPerHr
+    'basin_id': basinAsset,
+    'soil_conductivity': ksatMeanCmPerHr
   });
 };
 
@@ -36,6 +35,6 @@ Export.table.toDrive({
   collection: elevationFeatureCollection,
   description: 'HydraulicConductivity',
   fileFormat: 'CSV',
-  selectors: ['Basin_ID', 'Hydraulic_conductivity']
+  selectors: ['basin_id', 'soil_conductivity']
 });
 
