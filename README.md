@@ -6,7 +6,7 @@ Flood prediction using LSTM and Deep Learning approaches
 
 ## Virtual environment
 
-Create a python virtual environment to install necessary packages:
+Create a python virtual environment to install all the necessary packages:
 
 ```bash
 python -m venv .venv
@@ -14,7 +14,7 @@ python -m venv .venv
 
 ## Installation
 
-Install the required packages to the created virtual environment
+Install the required packages into the created virtual environment
 
 ```bash
 pip install -r requirements.txt
