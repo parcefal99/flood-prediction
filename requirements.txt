@@ -3,3 +3,4 @@ hydra-core
 hydra_colorlog
 earthengine-api
 geemap
+ipykernel

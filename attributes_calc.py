@@ -6,10 +6,12 @@ from functools import reduce
 import hydra
 from omegaconf import DictConfig
 
+import scipy
 import numpy as np
 import pandas as pd
-import scipy
 from tqdm import trange
+
+import utils
 
 
 @hydra.main(config_name="config", config_path="conf", version_base=None)
@@ -17,7 +19,12 @@ def main(cfg: DictConfig) -> None:
     log = logging.getLogger(__name__)
 
     # create the necessary directories
-    make_dirs(cfg)
+    utils.make_dirs(cfg)
+    process_attributes(cfg, log)
+
+
+def process_attributes(cfg: DictConfig, log: logging.Logger) -> None:
+    """Main function to process the attributes"""
 
     # get the list of selected basins
     selected_df = get_selected_basins(cfg.dataset.selected_basins)
@@ -36,34 +43,6 @@ def main(cfg: DictConfig) -> None:
     # calculate attributes based on attributes
     df = post_calc_attributes(df)
     save_attributes(df, cfg, log)
-
-
-def make_dirs(
-    cfg: DictConfig,
-) -> tuple[pathlib.Path, pathlib.Path, pathlib.Path, pathlib.Path]:
-    """Creates all the necessary directories for the dataset"""
-
-    # create directory for dataset
-    dataset_path = pathlib.Path(cfg.dataset.path)
-    if not dataset_path.exists():
-        dataset_path.mkdir()
-
-    # create directory for merged station forcings if not exists
-    forcing_path = dataset_path / cfg.dataset.forcing
-    if not forcing_path.exists():
-        forcing_path.mkdir()
-
-    # create directory for time_series output if not exists
-    time_series_path = dataset_path / cfg.dataset.time_series
-    if not time_series_path.exists():
-        time_series_path.mkdir()
-
-    # create directory for time_series output if not exists
-    attributes_path = dataset_path / cfg.dataset.catchment_attributes.path
-    if not attributes_path.exists():
-        attributes_path.mkdir()
-
-    return dataset_path, forcing_path, time_series_path, attributes_path
 
 
 def is_data_okay(df: pd.DataFrame) -> bool:
