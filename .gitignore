@@ -163,5 +163,7 @@ cython_debug/
 
 .DS_Store
 
+output_logs/
+
 # Project
 /data

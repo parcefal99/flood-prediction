@@ -1,0 +1,1 @@
+all JavaScript files used to derive the catchment attributes with Google Earth Engine
