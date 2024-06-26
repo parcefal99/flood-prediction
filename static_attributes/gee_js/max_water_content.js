@@ -20,8 +20,8 @@ var basinAssets = [
       });
       wcsat_stats = ee.Number(wcsat_stats.get("b1")).divide(10000);
       return ee.Feature(null, {
-      'Basin_ID': basinAsset,
-      'Max_water_content': wcsat_stats
+      'basin_id': basinAsset,
+      'max_water_content': wcsat_stats
     });
     }
   
@@ -36,6 +36,6 @@ var basinAssets = [
     collection: elevationFeatureCollection,
     description: 'maxWaterContent',
     fileFormat: 'CSV',
-    selectors: ['Basin_ID', 'Max_water_content']
+    selectors: ['basin_id', 'max_water_content']
   });
   

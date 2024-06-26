@@ -63,10 +63,10 @@ var basinAssets = [
       .divide(6));
       
     return ee.Feature(null, {
-      'Basin_ID': basinAsset,
-      'Sand': sand_mean_value,
-      'Silt': silt_mean_value,
-      'Clay': clay_mean_value
+      'basin_id': basinAsset,
+      'sand_frac': sand_mean_value,
+      'silt_frac': silt_mean_value,
+      'clay_frac': clay_mean_value
     });
   }
   
@@ -81,5 +81,5 @@ var basinAssets = [
     collection: elevationFeatureCollection,
     description: 'SandSiltClayFraction',
     fileFormat: 'CSV',
-    selectors: ['Basin_ID', 'Sand', 'Silt', 'Clay']
+    selectors: ['Basin_ID', 'sand', 'silt', 'clay']
   });
