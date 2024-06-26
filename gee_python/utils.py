@@ -7,6 +7,10 @@ import time
 import os 
 
 
+
+DIR_PATH = '../shapefiles'
+PROJECT_ID = 'virtual-rarity-426212-p6'
+
 def extractROI(asset_folder: str)->List[ee.Geometry]:
     
     """ Extraction of coordinates for a list of basis 
@@ -35,8 +39,6 @@ def extractROI(asset_folder: str)->List[ee.Geometry]:
 
 
 
-DIR_PATH = '../shapefiles'
-PROJECT_ID = 'virtual-rarity-426212-p6'
 
 
 # create zipfiles for shapefiles 
