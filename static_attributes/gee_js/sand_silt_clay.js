@@ -81,5 +81,5 @@ var basinAssets = [
     collection: elevationFeatureCollection,
     description: 'SandSiltClayFraction',
     fileFormat: 'CSV',
-    selectors: ['Basin_ID', 'sand_frac', 'silt_frac', 'clay_frac']
+    selectors: ['basin_id', 'sand_frac', 'silt_frac', 'clay_frac']
   });
