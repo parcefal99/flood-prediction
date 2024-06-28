@@ -15,6 +15,11 @@ def make_dirs(cfg: DictConfig) -> None:
     if not forcing_path.exists():
         forcing_path.mkdir()
 
+    # create directory for streamflow if not exists
+    streamflow_path = dataset_path / cfg.dataset.streamflow
+    if not streamflow_path.exists():
+        streamflow_path.mkdir()
+
     # create directory for time_series output if not exists
     time_series_path = dataset_path / cfg.dataset.time_series
     if not time_series_path.exists():

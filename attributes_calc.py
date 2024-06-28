@@ -114,17 +114,22 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
         )
         df_forcing = insert_srad(df_forcing, df_srad)
 
+        result.append(process_basin(df_forcing, row["basin"]))
+
+        # fill missing days
+        df_forcing["date"] = pd.to_datetime(df_forcing["date"])
+        df_forcing = df_forcing.set_index("date")
+        df_forcing = df_forcing.asfreq("D", fill_value=np.nan)
         # save merged station forcings
         df_forcing.to_csv(
-            f"{dataset_path / cfg.dataset.forcing}/{row['basin']}.csv", index=False
+            f"{dataset_path / cfg.dataset.forcing}/{row['basin']}.csv"
         )
-
-        result.append(process_basin(df_forcing, row["basin"]))
 
         # get streamflow data
         df_streamflow = load_hydro_by_id(
             str(row["basin"]), kazhydromet_path / cfg.kazhydromet.hydro
         )
+        df_streamflow.to_csv(f"{dataset_path / cfg.dataset.streamflow}/{row['basin']}.csv" )
 
         # merge basin forcing and streamflow
         df = merge_timeseries(df_forcing, df_streamflow)
@@ -329,9 +334,9 @@ def merge_timeseries(
     df_forcing: pd.DataFrame, df_streamflow: pd.DataFrame
 ) -> pd.DataFrame:
     """Merge basin mean forcing and streamflow"""
-    df_forcing["date"] = pd.to_datetime(df_forcing["date"])
-    df_forcing = df_forcing.set_index("date")
-    df = df_forcing.merge(df_streamflow, how="inner", left_index=True, right_index=True)
+    # df_forcing["date"] = pd.to_datetime(df_forcing["date"])
+    # df_forcing = df_forcing.set_index("date")
+    df = df_forcing.merge(df_streamflow, how="left", left_index=True, right_index=True)
     return df
 
 

@@ -5,3 +5,6 @@ earthengine-api
 geemap
 ipykernel
 selenium
+xarray
+netCDF4
+cftime

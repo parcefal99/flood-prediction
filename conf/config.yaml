@@ -63,6 +63,7 @@ dataset:
 
   # directory name for dynamic features for each basin (.csv)
   forcing: "mean_basin_forcing"
+  streamflow: "streamflow"
 
   # Google Earth Engine
   gee:
