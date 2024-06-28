@@ -33,14 +33,22 @@ List available gpu index and its unique id
 ```bash
 nvidia-smi --query-gpu=index,uuid --format=csv
 ```
-To run the Docker container, use the following command pattern:
+To run the Docker container, use the following command pattern (Note: run using tmux!):
 ```bash
+tmux new -s session_name
 docker run --name container_name --gpus '"device=GPU-id"' --rm -v /local/path:/container/path --workdir /container/path image_name command
 ```
 Example:
 ```bash
 docker run --name test_run1 --gpus '"device=GPU-a6535fb0-896f-edf3-632a-c44f49ad8600"' --rm -v /raid/abzal_nurgazy/flood-prediction:/workspace \
 --workdir /workspace flood-prediction python3 test_run.py```
+
+To see running processes in tmux. Use CTRL+B D to detach from the current session 
+```
+tmux list-sessions
+tmux attach-session -t session_name
+```
+
 
 
 
