@@ -41,10 +41,11 @@ docker run --name container_name --gpus '"device=GPU-id"' --rm -v /local/path:/c
 Example:
 ```bash
 docker run --name test_run1 --gpus '"device=GPU-a6535fb0-896f-edf3-632a-c44f49ad8600"' --rm -v /raid/abzal_nurgazy/flood-prediction:/workspace \
---workdir /workspace flood-prediction python3 test_run.py```
+--workdir /workspace flood-prediction python3 test_run.py
+```
 
 To see running processes in tmux. Use CTRL+B D to detach from the current session 
-```
+``` bash
 tmux list-sessions
 tmux attach-session -t session_name
 ```
