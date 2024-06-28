@@ -161,8 +161,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+# some other staff
+static_data.csv
 .DS_Store
-
 output_logs/
 
 # Project
