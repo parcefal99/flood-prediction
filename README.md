@@ -27,7 +27,7 @@ rsync -azP /local/path/to/source/file user_name@server_ip:/remote/path/to/destin
 ```
 Example:
 ```bash
-rsync -azP /Users/abzal/Desktop/issai-srp/php03V9iD.png abzal_nurgazy@10.10.25.13:/raid/abzal_nurgazy/flood-prediction```
+rsync -azP /Users/abzal/Desktop/issai-srp/php03V9iD.png abzal_nurgazy@10.10.25.13:/raid/abzal_nurgazy/flood-prediction
 ```
 List available gpu index and its unique id
 ```bash
