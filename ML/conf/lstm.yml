@@ -1,7 +1,7 @@
 # --- Experiment configurations --------------------------------------------------------------------
 
 # experiment name, used as folder name
-experiment_name: transformer
+experiment_name: lstm
 
 # place to store run directory (if empty runs are stored in $cwd$/runs/)
 run_dir:
@@ -23,7 +23,7 @@ test_end_date: '31/12/2021'
 seed: 42
 
 # which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
-device: cuda:0
+device: cuda:5
 
 # --- Validation configuration ---------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ initial_forget_bias: 3
 # Dropout applied to the output of the LSTM
 output_dropout: 0.4
 
-output_activation: relu
+output_activation: linear
 
 # --- Training configuration -----------------------------------------------------------------------
 
