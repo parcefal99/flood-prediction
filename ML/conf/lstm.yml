@@ -76,7 +76,7 @@ learning_rate:
     40: 1e-5
 
 # Mini-batch size
-batch_size: 256
+batch_size: 1024
 
 # Number of training epochs
 epochs: 20
