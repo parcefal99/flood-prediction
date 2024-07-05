@@ -149,6 +149,7 @@ static_attributes:
 - p_mean
 - pet_mean
 - aridity
+- p_seasonality
 - frac_snow_daily
 - high_prec_freq
 - high_prec_dur
