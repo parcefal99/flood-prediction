@@ -36,6 +36,7 @@ validate_n_random_basins: 42
 # specify which metrics to calculate during validation (see codebase.evaluation.metrics)
 metrics:
 - NSE
+- KGE
 
 # --- Model configuration --------------------------------------------------------------------------
 
