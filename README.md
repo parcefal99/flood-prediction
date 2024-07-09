@@ -2,6 +2,7 @@
 
 Flood prediction using LSTM and Deep Learning approaches
 
+
 # Setup
 
 ## Virtual environment
@@ -29,6 +30,7 @@ pip install -r requirements.txt
 ## Data
 
 To prepare the dataset see the [dataset readme file](https://github.com/LuftWaffe99/flood-prediction/tree/main/dataset/README.md).
+
 
 # Server
 

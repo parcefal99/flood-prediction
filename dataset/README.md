@@ -12,10 +12,20 @@ Following this section read `/conf/config.yaml` if you get an error or some unex
 
 Create `/data/GEE` directory and place all GEE attribute files inside
 
-## Pipeline
+## Dataset
 
-To prepare static attributes from dynamic ones run:
+To prepare the dataset run:
 
 ```bash
 python pipeline.py
 ```
+
+This script will create `/data/CAMELS_KZ` dataset directory with the following structure:
+
+- `CAMELS_KZ`
+    - `attributes` (contains static attributes split into multiple files)
+    - `mean_basin_forcing`
+    - `streamflow` 
+    - `time_series` (`.nc` files of combined dynamic attributes of meteo and hydro data)
+
+Files contained in `time_series` are the end files used for training the models.
