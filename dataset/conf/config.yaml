@@ -9,10 +9,10 @@ hydra:
 
 dataset:
   # path to selected basins file
-  selected_basins: "./data/selected_basins.csv"
+  selected_basins: "../data/selected_basins.csv"
 
   # the dataset directory
-  path: "./data/CAMELS_KZ"
+  path: "../data/CAMELS_KZ"
   # directory name for dynamic features for each basin (.nc)
   # required for `neuralhydrology`
   time_series: "time_series"
@@ -68,7 +68,7 @@ dataset:
   # Google Earth Engine
   gee:
     # path to the directory
-    path: "./data/GEE"
+    path: "../data/GEE"
     catchment_attributes:
       path: "attributes"
     forcing:
@@ -78,7 +78,7 @@ dataset:
 # KazHydroMet config for parser
 kazhydromet:
   # directory for dataset
-  path: "./data/kazhydromet"
+  path: "../data/kazhydromet"
   # directory for meteo stations
   meteo: "basin_forcing"
   # directory for hydro stations

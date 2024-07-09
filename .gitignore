@@ -167,5 +167,5 @@ static_data.csv
 output_logs/
 
 # Project
-/data
-/runs
+data
+runs
