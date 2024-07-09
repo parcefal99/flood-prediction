@@ -121,18 +121,20 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
         df_forcing = df_forcing.set_index("date")
         df_forcing = df_forcing.asfreq("D", fill_value=np.nan)
         # save merged station forcings
-        df_forcing.to_csv(
-            f"{dataset_path / cfg.dataset.forcing}/{row['basin']}.csv"
-        )
+        df_forcing.to_csv(f"{dataset_path / cfg.dataset.forcing}/{row['basin']}.csv")
 
         # get streamflow data
         df_streamflow = load_hydro_by_id(
             str(row["basin"]), kazhydromet_path / cfg.kazhydromet.hydro
         )
-        df_streamflow.to_csv(f"{dataset_path / cfg.dataset.streamflow}/{row['basin']}.csv" )
+        df_streamflow.to_csv(
+            f"{dataset_path / cfg.dataset.streamflow}/{row['basin']}.csv"
+        )
 
         # merge basin forcing and streamflow
         df = merge_timeseries(df_forcing, df_streamflow)
+        df["discharge_prev"] = df["discharge"].shift(1)
+        df["level_prev"] = df["level"].shift(1)
         save_timeseries(df, str(row["basin"]), dataset_path / cfg.dataset.time_series)
 
         if i == len(basin_groups) - 1:

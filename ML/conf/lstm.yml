@@ -127,6 +127,12 @@ dynamic_inputs:
 - t_min
 - pp_mean
 
+- sat_max
+- hum_mean
+- dew_min
+
+- discharge_prev
+- level_prev
 
 # which columns to use as target
 target_variables:

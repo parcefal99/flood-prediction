@@ -19,5 +19,5 @@ python train.py
 
 Options:
 
-- gpu <gpu_id> (take from allowed gpus list at `gpu.json`)
-- continue_training 
+- --gpu <gpu_id> (take from allowed gpus list at `gpu.json`)
+- --continue_training (continues training from the last epoch)
