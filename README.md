@@ -1,7 +1,9 @@
-# flood-prediction
+# Flood Prediction Project
 
-Flood prediction using LSTM and Deep Learning approaches
+Flood prediction using LSTM and Deep Learning approaches.
 
+![PyTorch](https://img.shields.io/badge/PyTorch-%2523EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
+![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
 
 # Setup
 
