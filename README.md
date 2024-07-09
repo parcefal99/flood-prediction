@@ -31,7 +31,12 @@ pip install -r requirements.txt
 
 ## Data
 
-To prepare the dataset see the [dataset readme file](https://github.com/LuftWaffe99/flood-prediction/tree/main/dataset/README.md).
+To prepare the dataset see the [dataset README file](https://github.com/LuftWaffe99/flood-prediction/tree/main/dataset/README.md).
+
+
+# Training
+
+For training models see the [ML README file](https://github.com/LuftWaffe99/flood-prediction/tree/main/ML/README.md).
 
 
 # Server
