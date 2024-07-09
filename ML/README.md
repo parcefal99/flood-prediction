@@ -11,13 +11,16 @@
 
 ## Training
 
-To run the training execute:
+To see info about the program and available options execute the script with `-h` (or `--help`) flag:
+
+```bash
+python train.py -h
+```
+
+To run the training with default options execute:
 
 ```bash
 python train.py
 ```
 
-Options:
-
-- --gpu <gpu_id> (take from allowed gpus list at `gpu.json`)
-- --continue_training (continues training from the last epoch)
+Note it is recommended to see `--help` since it contains important information regarding the program.
