@@ -56,6 +56,20 @@ Example:
 rsync -azP /Users/abzal/Desktop/issai-srp/php03V9iD.png abzal_nurgazy@10.10.25.13:/raid/abzal_nurgazy/flood-prediction
 ```
 
+Make sure that only YOU can read and write your ssh file, otherwise you will get the follwing error while using rsync:
+
+```bash
+Permissions 0777 for '/Users/username/.ssh/id_rsa' are too open.
+It is recommended that your private key files are NOT accessible by others.
+This private key will be ignored.
+```
+
+To make your ssh keys read-writable only by you, use this:
+```bash 
+chmod 600 ~/.ssh/id_rsa
+```
+
+
 List available gpu index and its unique id
 
 ```bash
