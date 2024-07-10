@@ -40,7 +40,7 @@ def train():
         type=str,
         help="model to use",
         default="lstm",
-        choices=["lstm", "transformer"],
+        choices=["lstm", "ea_lstm", "transformer"],
         required=False,
     )
     args = parser.parse_args()
