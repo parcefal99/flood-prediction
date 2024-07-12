@@ -93,7 +93,7 @@ def get_post_list():
 
 if __name__ == '__main__':
     print("\n================ STARTING... ================\n")
-    driver.get("http://ecodata.kz:3838/app_hydro_en/")
+    driver.get("insert_the_website_address")
     post_list = get_post_list()
 
     st, sti = 0, 0
