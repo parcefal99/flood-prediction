@@ -131,8 +131,8 @@ dynamic_inputs:
 - hum_mean
 - dew_min
 
-# - discharge_prev         
-# - level_prev
+- discharge_prev         
+- level_prev
 
 # which columns to use as target
 target_variables:

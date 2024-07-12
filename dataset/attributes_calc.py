@@ -1,6 +1,6 @@
 import os
 import logging
-import pathlib
+from pathlib import Path
 from functools import reduce
 
 import hydra
@@ -42,7 +42,14 @@ def process_attributes(cfg: DictConfig, log: logging.Logger) -> None:
 
     # calculate attributes based on attributes
     df = post_calc_attributes(df)
+
+    # save static attributes
     save_attributes(df, cfg, log)
+    # prepare dynamic features
+    log.info(f"Processing dynamic attributes")
+    process_dynamic_features(df, cfg, log)
+
+    log.info("Program successfully completed")
 
 
 def is_data_okay(df: pd.DataFrame) -> bool:
@@ -76,8 +83,8 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
     basin_groups = selected_df.groupby("basin")
     basin_groups_iter = iter(basin_groups)
 
-    dataset_path = pathlib.Path(cfg.dataset.path)
-    kazhydromet_path = pathlib.Path(cfg.kazhydromet.path)
+    dataset_path = Path(cfg.dataset.path)
+    kazhydromet_path = Path(cfg.kazhydromet.path)
     # all present stations
     all_stations = os.listdir(kazhydromet_path / cfg.kazhydromet.meteo)
 
@@ -108,7 +115,7 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
             df_forcing = stations[0]
 
         # insert solar radiation for each day
-        gee_path = pathlib.Path(cfg.dataset.gee.path)
+        gee_path = Path(cfg.dataset.gee.path)
         df_srad = load_srad_by_basin(
             row["basin"], gee_path / cfg.dataset.gee.forcing[0]
         )
@@ -122,20 +129,6 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
         df_forcing = df_forcing.asfreq("D", fill_value=np.nan)
         # save merged station forcings
         df_forcing.to_csv(f"{dataset_path / cfg.dataset.forcing}/{row['basin']}.csv")
-
-        # get streamflow data
-        df_streamflow = load_hydro_by_id(
-            str(row["basin"]), kazhydromet_path / cfg.kazhydromet.hydro
-        )
-        df_streamflow.to_csv(
-            f"{dataset_path / cfg.dataset.streamflow}/{row['basin']}.csv"
-        )
-
-        # merge basin forcing and streamflow
-        df = merge_timeseries(df_forcing, df_streamflow)
-        df["discharge_prev"] = df["discharge"].shift(1)
-        df["level_prev"] = df["level"].shift(1)
-        save_timeseries(df, str(row["basin"]), dataset_path / cfg.dataset.time_series)
 
         if i == len(basin_groups) - 1:
             t.set_description("Done")
@@ -184,6 +177,94 @@ def post_calc_attributes(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def process_dynamic_features(
+    df: pd.DataFrame, cfg: DictConfig, log: logging.Logger
+) -> pd.DataFrame:
+    """Process and prepare the dynamic features"""
+    dataset_path = Path(cfg.dataset.path)
+    kazhydromet_path = Path(cfg.kazhydromet.path)
+
+    autoregressive = cfg.dataset.autoregressive_features
+    log.info(f"Adding {len(autoregressive)} autoregressive features: {autoregressive}")
+
+    t = trange(len(df))
+    for i in t:
+        t.set_description(f"Basin {i+1}")
+        row = df.iloc[i]
+        # apply scales
+        df_forcing = scale_forcing(cfg, log, row, dataset_path)
+        df_streamflow = scale_streamflow(cfg, log, row, dataset_path, kazhydromet_path)
+        # merge basin forcing and streamflow
+        df_timeseries = merge_timeseries(df_forcing, df_streamflow)
+        df_timeseries = add_autoregressive_features(
+            df_timeseries,
+            features=cfg.dataset.autoregressive_features,
+            basin_id=row.name,
+            log=log,
+        )
+        # save .nc files
+        save_timeseries(
+            df_timeseries, str(row.name), dataset_path / cfg.dataset.time_series
+        )
+
+        if i == len(df) - 1:
+            t.set_description("Done")
+
+
+def scale_forcing(
+    cfg: DictConfig,
+    log: logging.Logger,
+    row: pd.Series,
+    dataset_path: Path,
+) -> pd.DataFrame:
+    """Scale basin forcing"""
+    df = pd.read_csv(f"{dataset_path / cfg.dataset.forcing}/{row.name}.csv")
+    # convert date
+    df["date"] = pd.to_datetime(df["date"])
+    # set date as index
+    df = df.set_index("date")
+    # scale pp_mean
+    df["pp_mean"] = df["pp_mean"] * 100
+    return df
+
+
+def scale_streamflow(
+    cfg: DictConfig,
+    log: logging.Logger,
+    row: pd.Series,
+    dataset_path: Path,
+    kazhydromet_path: Path,
+) -> pd.DataFrame:
+    """Scale the discharge value by the formula: discharge * 86400 * 10**3 / (area_gages2 * 10**6)"""
+    # get streamflow data
+    df = load_hydro_by_id(str(row.name), kazhydromet_path / cfg.kazhydromet.hydro)
+    # check if area for basin is present
+    if "area_gages2" not in row.keys().tolist() or row["area_gages2"] is None:
+        log.error(
+            f"No area gauges2 is present for `{str(row.name)}` basin. Scaling streamflow is not possible."
+        )
+        return df
+    # scale the discharge
+    df["discharge"] = df["discharge"] * 86400 * 10**3 / (row["area_gages2"] * 10**6)
+    df.to_csv(f"{dataset_path / cfg.dataset.streamflow}/{str(row.name)}.csv")
+    return df
+
+
+def add_autoregressive_features(
+    df: pd.DataFrame, features: list[str], basin_id: str, log: logging.Logger
+) -> pd.DataFrame:
+    """Adds autoregressive features given in `features`"""
+    if not set(features).issubset(df.columns.tolist()):
+        raise Exception(
+            f"Some features `{features}` are not contained in `{df.columns.tolist()}` for basin `{basin_id}`!"
+        )
+
+    for feature in features:
+        df[feature + "_prev"] = df[feature].shift(1)
+
+    return df
+
+
 def merge_stations(df1: pd.DataFrame, df2: pd.DataFrame) -> pd.DataFrame:
     """
     Merge multiple stations
@@ -222,8 +303,8 @@ def merge_attributes(df: pd.DataFrame, cfg: DictConfig) -> pd.DataFrame:
 
     df = df.set_index("basin_id")
 
-    # dataset_path = pathlib.Path(cfg.dataset.path)
-    gee_path = pathlib.Path(cfg.dataset.gee.path)
+    # dataset_path = Path(cfg.dataset.path)
+    gee_path = Path(cfg.dataset.gee.path)
     files = os.listdir(gee_path)
 
     # search for `.csv` files in GEE directory
@@ -240,7 +321,7 @@ def save_attributes(df: pd.DataFrame, cfg: DictConfig, log: logging.Logger) -> N
     """Save the processed catchment attributes"""
 
     with_errors: bool = False
-    dataset_path = pathlib.Path(cfg.dataset.path)
+    dataset_path = Path(cfg.dataset.path)
     attributes_path = dataset_path / cfg.dataset.catchment_attributes.path
 
     df_cols = df.columns.tolist()
@@ -316,7 +397,7 @@ def load_hydro_by_id(basin_id: str, path: str) -> pd.DataFrame:
     return df[["discharge", "level"]]
 
 
-def load_srad_by_basin(basin_id: str, srad_path: pathlib.Path) -> pd.DataFrame:
+def load_srad_by_basin(basin_id: str, srad_path: Path) -> pd.DataFrame:
     """Loads solar radiantion data for specific basin"""
     filepath = srad_path / f"{basin_id}.csv"
     try:

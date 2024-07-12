@@ -17,6 +17,11 @@ dataset:
   # required for `neuralhydrology`
   time_series: "time_series"
 
+  # which features to prepare as autoregressive
+  autoregressive_features:
+    - level
+    - discharge
+
   # cathcment attributes
   catchment_attributes:
     # directory for cathcment attributes
