@@ -156,7 +156,7 @@ def get_sidebar():
 
 if __name__ == '__main__':
     print("\n================ STARTING... ================\n")
-    driver.get("http://ecodata.kz:3838/dm_climat_en/")
+    driver.get("insert_the_website_address")
 
     if not os.path.exists("kazhydromet"):
         os.makedirs("kazhydromet")
