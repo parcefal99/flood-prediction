@@ -1,3 +1,4 @@
+import json
 import argparse
 from pathlib import Path
 from typing import Optional
@@ -23,6 +24,17 @@ sns.set_style("whitegrid")
 
 
 def main() -> None:
+    # check if CUDA available
+    if torch.cuda.is_available():
+        pass
+    else:
+        raise Exception("No GPU found!")
+    
+    # load allowed GPU ids
+    f = open("gpu.json")
+    gpus = json.load(f)
+    f.close()
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -38,7 +50,20 @@ def main() -> None:
         required=True,
         help="model epoch to use",
     )
+    parser.add_argument(
+        "--gpu",
+        type=int,
+        help="gpu id",
+        default=gpus[0],
+        required=False,
+    )
+
     args = parser.parse_args()
+
+    if args.gpu not in gpus:
+        raise Exception(
+            f"Specified prohibited gpu id: `{args.gpu}`, allowed gpu ids are: `{gpus}`"
+        )
 
     run_dir = Path(args.run_dir)
     # check whether run_dir exists
@@ -48,13 +73,15 @@ def main() -> None:
     # get basins
     basins_path = Path("./basins.txt")
     basins = pd.read_csv(basins_path, header=None)[0].tolist()
-    evaluate_basins(run_dir, basins, epoch=args.epoch)
+    evaluate_basins(run_dir, basins, epoch=args.epoch, gpu=args.gpu)
 
 
-def evaluate_basins(run_dir: Path, basins: list, epoch: int) -> None:
+def evaluate_basins(run_dir: Path, basins: list, epoch: int, gpu: int) -> None:
     """Saves plots of observed vs predicted data for specified basins"""
 
     cfg = get_cfg(run_dir)
+    cfg.update_config({"device": f"cuda:{gpu}"})
+
     model = load_model(cfg, run_dir, epoch=epoch)
     mean, std = get_scaler_vals(run_dir)
 

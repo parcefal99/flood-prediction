@@ -34,7 +34,13 @@ Note it is recommended to see `--help` since it contains important information r
 To run:
 
 ```bash
-python hindcast.py ---run_dir RUN_DIR --epoch EPOCH
+python hindcast.py ---run_dir RUN_DIR --epoch EPOCH --gpu GPU_ID
+```
+
+To understand the arguments run:
+
+```bash
+python hindcast.py -h
 ```
 
 Currently it feeds meteo data and previous discharge. Meteo data present the observed data (needs to be predicted too in the future), previous discharge for previous 365 days initially composed of observed data too, but in the process of hindcast, the predicted values are added as previous discharge. E.g. if we predict discharge for tomorrow, the discharge for today is fed as previous discharge, for predicting the discharge for the day after tomorrow, we fed the discharge for tomorrow as previous one.

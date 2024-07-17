@@ -33,7 +33,11 @@ def train():
         default=False,
     )
     parser.add_argument(
-        "--gpu", type=int, help="gpu id", default=gpus[0], required=False
+        "--gpu",
+        type=int,
+        help="gpu id",
+        default=gpus[0],
+        required=False,
     )
     parser.add_argument(
         "--model",
