@@ -8,3 +8,4 @@ selenium
 xarray
 netCDF4
 cftime
+seaborn
