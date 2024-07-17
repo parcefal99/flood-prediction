@@ -8,6 +8,7 @@
 - `finetune_basin.txt` contains a list of bains on which to finetune models
 - `gpu.json` presents a list of gpus allowed to use
 - `train.py` training script
+- `hindcast.py` script to plot observed vs predicted values
 
 ## Training
 
@@ -24,3 +25,20 @@ python train.py
 ```
 
 Note it is recommended to see `--help` since it contains important information regarding the program.
+
+
+## Hindcast evaluation
+
+`hindcast.py` plots observed vs predicted data. 
+
+To run:
+
+```bash
+python hindcast.py ---run_dir RUN_DIR --epoch EPOCH
+```
+
+Currently it feeds meteo data and previous discharge. Meteo data present the observed data (needs to be predicted too in the future), previous discharge for previous 365 days initially composed of observed data too, but in the process of hindcast, the predicted values are added as previous discharge. E.g. if we predict discharge for tomorrow, the discharge for today is fed as previous discharge, for predicting the discharge for the day after tomorrow, we fed the discharge for tomorrow as previous one.
+
+### Output
+
+The images will be saved in the specified `run_dir/img_log`.
