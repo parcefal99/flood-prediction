@@ -29,7 +29,7 @@ def main() -> None:
         pass
     else:
         raise Exception("No GPU found!")
-    
+
     # load allowed GPU ids
     f = open("gpu.json")
     gpus = json.load(f)
@@ -93,7 +93,7 @@ def evaluate_basins(run_dir: Path, basins: list, epoch: int, gpu: int) -> None:
         t.set_description(f"Basin {basin}")
 
         loader = get_basin_data(cfg, run_dir, basin_id=basin, period="test")
-        y_hat, y, year = get_cmp(model, loader, mean, std)
+        y_hat, y, year = get_cmp(cfg, model, loader, mean, std)
 
         plot_cmp(run_dir, basin_id=basin, y_hat=y_hat, y=y, year=year)
 
@@ -133,6 +133,7 @@ def load_model(cfg: Config, run_dir: Path, epoch: int = 20) -> nn.Module:
         epoch = "0" + epoch
     # load model parameters
     model.load_state_dict(torch.load(run_dir / f"model_epoch{epoch}.pt"))
+    model = model.to(cfg.device)
     return model
 
 
@@ -144,7 +145,7 @@ def get_scaler_vals(run_dir: Path) -> tuple[float, float]:
 
 
 def get_cmp(
-    model: nn.Module, loader: DataLoader, mean: float, std: float
+    cfg: Config, model: nn.Module, loader: DataLoader, mean: float, std: float
 ) -> tuple[list, list, str]:
     """Get predicted and observed data"""
 
@@ -164,8 +165,12 @@ def get_cmp(
         if i == 365:
             year = str(data["date"][0][-1]).split("-")[0]
 
+        for key in data.keys():
+            if not key.startswith("date"):
+                data[key] = data[key].to(cfg.device)
+
         x = model.pre_model_hook(data, is_train=False)
-        y = x["y"].detach().numpy()[0][-1][0]
+        y = x["y"].detach().cpu().numpy()[0][-1][0]
         # denormalize observed data
         y = y * std + mean
         # save observed data
@@ -179,7 +184,7 @@ def get_cmp(
 
         # obtain and save predictions
         prediction = model(x)
-        predictions.append(prediction["y_hat"].detach().numpy()[0][-1][0])
+        predictions.append(prediction["y_hat"].detach().cpu().numpy()[0][-1][0])
 
     # denormalize predictions
     predictions = np.array(predictions) * std + mean
