@@ -9,12 +9,14 @@ from torch.utils.data import DataLoader
 
 import numpy as np
 import pandas as pd
+import xarray as xr
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 from tqdm import trange
 
 from neuralhydrology.modelzoo import get_model
+from neuralhydrology.evaluation import metrics
 from neuralhydrology.utils.config import Config
 from neuralhydrology.datautils.utils import load_scaler
 from neuralhydrology.datasetzoo import BaseDataset, get_dataset
@@ -57,6 +59,13 @@ def main() -> None:
         default=gpus[0],
         required=False,
     )
+    parser.add_argument(
+        "--period",
+        type=str,
+        default="test",
+        choices=["validation", "test"],
+        help="period for hindcast",
+    )
 
     args = parser.parse_args()
 
@@ -70,13 +79,22 @@ def main() -> None:
     if not run_dir.exists():
         raise Exception(f"Specified run_dir does not exists: `{run_dir}`")
 
+    plots_period_path: Path = run_dir / "evaluation" / "plots_log" / args.period
+    plots_period_path.mkdir(parents=True, exist_ok=True)
+    timeseries_period_path: Path = (
+        run_dir / "evaluation" / "timeseries_log" / args.period
+    )
+    timeseries_period_path.mkdir(parents=True, exist_ok=True)
+
     # get basins
     basins_path = Path("./basins.txt")
     basins = pd.read_csv(basins_path, header=None)[0].tolist()
-    evaluate_basins(run_dir, basins, epoch=args.epoch, gpu=args.gpu)
+    evaluate_basins(run_dir, basins, epoch=args.epoch, period=args.period, gpu=args.gpu)
 
 
-def evaluate_basins(run_dir: Path, basins: list, epoch: int, gpu: int) -> None:
+def evaluate_basins(
+    run_dir: Path, basins: list, epoch: int, period: str, gpu: int
+) -> None:
     """Saves plots of observed vs predicted data for specified basins"""
 
     cfg = get_cfg(run_dir)
@@ -87,18 +105,52 @@ def evaluate_basins(run_dir: Path, basins: list, epoch: int, gpu: int) -> None:
 
     basins_iter = iter(basins)
 
+    nse_basins = np.empty(len(basins), dtype=np.float32)
+
     t = trange(len(basins))
     for i in t:
         basin = next(basins_iter)
         t.set_description(f"Basin {basin}")
 
-        loader = get_basin_data(cfg, run_dir, basin_id=basin, period="test")
-        y_hat, y, year = get_cmp(cfg, model, loader, mean, std)
+        loader = get_basin_data(cfg, run_dir, basin_id=basin, period=period)
+        y_hat, y, year_start, year_end = get_cmp(cfg, model, loader, basin, mean, std)
 
-        plot_cmp(run_dir, basin_id=basin, y_hat=y_hat, y=y, year=year)
+        nse = compute_nse(y_hat, y)
+        nse_basins[i] = nse
+        t.set_postfix({"nse": nse})
+
+        plot_cmp(
+            run_dir,
+            basin_id=basin,
+            y_hat=y_hat,
+            y=y,
+            period=period,
+            year_start=year_start,
+            year_end=year_end,
+        )
 
         if i == len(basins) - 1:
             t.set_description("Done")
+
+    nse_basins = pd.DataFrame({"NSE": nse_basins})
+    nse_basins_stats = pd.DataFrame(
+        {
+            "NSE_mean": [nse_basins.mean()],
+            "NSE_median": [np.median(nse_basins[np.isfinite(nse_basins)])],
+            "NSE_min": [nse_basins.min()],
+            "NSE_max": [nse_basins.max()],
+        }
+    )
+    nse_basins.to_csv(run_dir / "evaluation" / "nse_metrics.csv", index=False)
+    nse_basins_stats.to_csv(
+        run_dir / "evaluation" / "nse_metrics_stats.csv", index=False
+    )
+
+
+def compute_nse(y_hat: np.ndarray, y: np.ndarray) -> float:
+    obs = xr.DataArray(data=y, name="discharge_obs")
+    sim = xr.DataArray(data=y_hat, name="discharge_sim")
+    return metrics.nse(obs, sim)
 
 
 def get_cfg(run_dir: Path, update_dict: Optional[dict] = None) -> Config:
@@ -109,7 +161,7 @@ def get_cfg(run_dir: Path, update_dict: Optional[dict] = None) -> Config:
 
 
 def get_basin_data(
-    cfg: Config, run_dir: Path, basin_id: str, period: str = "test"
+    cfg: Config, run_dir: Path, basin_id: str, period: str
 ) -> DataLoader:
     ds = get_dataset(
         cfg=cfg,
@@ -145,25 +197,33 @@ def get_scaler_vals(run_dir: Path) -> tuple[float, float]:
 
 
 def get_cmp(
-    cfg: Config, model: nn.Module, loader: DataLoader, mean: float, std: float
+    cfg: Config,
+    model: nn.Module,
+    loader: DataLoader,
+    basin_id: int,
+    mean: float,
+    std: float,
 ) -> tuple[list, list, str]:
     """Get predicted and observed data"""
 
     predictions = []
-    actual = []
+    observations = []
 
-    year = None
+    year_start = None
+    year_end = None
 
     for i, data in enumerate(loader):
         # wait for one year to pass (to have data for previous year)
         if i < 365:
             continue
         # stop after the second year
-        if i == 365 * 2:
-            break
+        # if i == 365 * 2:
+        #     break
 
         if i == 365:
-            year = str(data["date"][0][-1]).split("-")[0]
+            year_start = str(data["date"][0][-1]).split("-")[0]
+        elif i == len(loader) - 1:
+            year_end = str(data["date"][0][-1]).split("-")[0]
 
         for key in data.keys():
             if not key.startswith("date"):
@@ -171,27 +231,38 @@ def get_cmp(
 
         x = model.pre_model_hook(data, is_train=False)
         y = x["y"].detach().cpu().numpy()[0][-1][0]
-        # denormalize observed data
-        y = y * std + mean
         # save observed data
-        actual.append(y)
+        observations.append(y)
         del x["y"]
 
         # change observed data on predicted data
         # it changes as many values as there are in the `predicted` array
         if i > 365:
-            x["x_d"][0][-len(predictions) :][:, 8] = torch.tensor(predictions)
+            x["x_d"][0][-len(predictions) :][:, 8] = torch.tensor(predictions)[-365:]
 
         # obtain and save predictions
         prediction = model(x)
-        predictions.append(prediction["y_hat"].detach().cpu().numpy()[0][-1][0])
+        pred = prediction["y_hat"].detach().cpu().numpy()[0][-1][0]
+
+        if np.isnan(pred) and i > 365:
+            pred = predictions[-1]
+        predictions.append(pred)
 
     # denormalize predictions
     predictions = np.array(predictions) * std + mean
-    return predictions, actual, year
+    observations = np.array(observations) * std + mean
+    return predictions, observations, year_start, year_end
 
 
-def plot_cmp(run_dir: Path, basin_id: str, y_hat: list, y: list, year: str) -> None:
+def plot_cmp(
+    run_dir: Path,
+    basin_id: str,
+    y_hat: list,
+    y: list,
+    period: str,
+    year_start: str,
+    year_end: str,
+) -> None:
     """Plot and save the comparison between observed vs predicted data"""
     df = pd.DataFrame(
         {
@@ -200,15 +271,20 @@ def plot_cmp(run_dir: Path, basin_id: str, y_hat: list, y: list, year: str) -> N
             "Predicted": y_hat,
         }
     )
+    df.to_csv(
+        run_dir / f"evaluation/timeseries_log/{period}/{basin_id}.csv",
+        sep=";",
+        index=False,
+    )
     ax = sns.lineplot(
         data=df, x="Day", y="Observed", linestyle="solid", label="Observed"
     )
     sns.lineplot(
         ax=ax, data=df, x="Day", y="Predicted", linestyle="solid", label="Predicted"
     )
-    ax.set_title(f"{basin_id}, year {year}")
+    ax.set_title(f"{basin_id}, {period} period ({year_start}-{year_end})")
     ax.set_ylabel("Discharge")
-    plt.savefig(run_dir / f"img_log/{basin_id}_test_year_{year}.png")
+    plt.savefig(run_dir / f"evaluation/plots_log/{period}/{basin_id}.png")
     plt.close()
 
 

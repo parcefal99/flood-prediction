@@ -2,14 +2,18 @@ import os
 import logging
 from pathlib import Path
 from functools import reduce
+from datetime import datetime
 
 import hydra
 from omegaconf import DictConfig
 
+import pytz
 import scipy
 import numpy as np
 import pandas as pd
 from tqdm import trange
+from astral.sun import sun
+from astral import LocationInfo
 
 import utils
 
@@ -117,7 +121,7 @@ def process_basins(cfg: DictConfig, selected_df: pd.DataFrame) -> pd.DataFrame:
         # insert solar radiation for each day
         gee_path = Path(cfg.dataset.gee.path)
         df_srad = load_srad_by_basin(
-            row["basin"], gee_path / cfg.dataset.gee.forcing[0]
+            row["basin"], basin_group, gee_path / cfg.dataset.gee.forcing[0]
         )
         df_forcing = insert_srad(df_forcing, df_srad)
 
@@ -174,6 +178,7 @@ def process_basin(df: pd.DataFrame, basin_id: str) -> pd.DataFrame:
 def post_calc_attributes(df: pd.DataFrame) -> pd.DataFrame:
     """Calculate attributes on GEE and KazHydroMet attributes"""
     df["aridity"] = calc_aridity(df)
+    df["slope_mean"] = np.tan(np.deg2rad(df["slope_mean"])) * 1000
     return df
 
 
@@ -397,7 +402,32 @@ def load_hydro_by_id(basin_id: str, path: str) -> pd.DataFrame:
     return df[["discharge", "level"]]
 
 
-def load_srad_by_basin(basin_id: str, srad_path: Path) -> pd.DataFrame:
+def daylight(date, lat, lon):
+    # setup
+    location = LocationInfo(latitude=lat, longitude=lon)
+    timezone = pytz.timezone("Asia/Almaty")
+    date_local = timezone.localize(datetime.combine(date, datetime.min.time()))
+
+    try:
+        # get sunrise/sunset
+        s = sun(location.observer, date=date_local)
+        sunrise = s["sunrise"].astimezone(timezone)
+        sunset = s["sunset"].astimezone(timezone)
+        sunrise_local = sunrise.astimezone(timezone)
+        sunset_local = sunset.astimezone(timezone)
+        # calc day length
+        daylight_duration = sunset_local - sunrise_local
+        # convert to seconds
+        daylight_seconds = daylight_duration.total_seconds()
+    except ValueError:
+        daylight_seconds = -1
+
+    return daylight_seconds
+
+
+def load_srad_by_basin(
+    basin_id: str, basin_group: pd.DataFrame, srad_path: Path
+) -> pd.DataFrame:
     """Loads solar radiantion data for specific basin"""
     filepath = srad_path / f"{basin_id}.csv"
     try:
@@ -409,7 +439,22 @@ def load_srad_by_basin(basin_id: str, srad_path: Path) -> pd.DataFrame:
     df["date"] = pd.to_datetime(df["date"])
     # remove records for year 2024
     df = df[df["date"].dt.year.ne(2024)]
+
+    # get mean coords for the basin
+    lat = basin_group["lat"].mean()
+    lng = basin_group["lng"].mean()
+
+    # get day length
+    df["dayl"] = df.apply(lambda row: daylight(row["date"], lat, lng), axis=1)
+    # set day length to day length of previous day if NaN
+    for i in range(1, len(df)):
+        if df.at[i, "dayl"] == -1.0:
+            df.at[i, "dayl"] = df.at[i - 1, "dayl"]
+    # scale srad
+    df["srad"] = df["srad"] / df["dayl"]
+
     df = df.set_index("date")
+
     return df
 
 
@@ -523,6 +568,10 @@ def calc_show_frac_daily(df: pd.DataFrame) -> float:
     # compute the fraction of snow to the total precipitations amount
     df_snow_frac_daily = df_snow_frac_daily["prcp"].sum() / df["prcp"].sum()
     return df_snow_frac_daily
+    # print(df.head())
+    # mean_monthly_temp = df["t_mean"].groupby(df.Mnth).mean()
+    # mean_monthly_precip = df["prcp"].groupby(df.Mnth).mean()
+    # return mean_monthly_precip.loc[mean_monthly_temp < 0].sum() / mean_monthly_precip.sum()
 
 
 def calc_aridity(df: pd.DataFrame) -> pd.Series:
@@ -582,7 +631,7 @@ def get_selected_basins(path: str) -> pd.DataFrame:
         )
 
     df = pd.read_csv(path, sep=",")
-    return df[["basin", "meteo_station"]]
+    return df[["basin", "meteo_station", "lng", "lat"]]
 
 
 if __name__ == "__main__":
