@@ -100,8 +100,8 @@ def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
 
     # save metrics
     df.to_csv(f"{str(run_dir)}/eval.csv")
-    df_stats = pd.concat([df.mean().to_frame().T, df.median().to_frame().T])
-    df_stats.set_index([["mean", "median"]])
+    df_stats = pd.concat([df.median().to_frame().T, df.mean().to_frame().T])
+    df_stats = df_stats.set_index([["median", "mean"]])
     df_stats.to_csv(f"{str(run_dir)}/eval_stats.csv", index=True)
 
 
