@@ -84,10 +84,12 @@ def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
         epoch_str = "0" + epoch
 
     df = None
+    df_stats = None
     for i, period in enumerate(periods):
         print(f"Evaluation on {period} period.")
         eval_run(run_dir, period=period, epoch=epoch, gpu=gpu)
         df_period = eval_results(run_dir, period, epoch=epoch_str)
+
         df_period = df_period.rename(
             columns={"NSE": f"NSE_{period}", "KGE": f"KGE_{period}"}
         )
@@ -98,6 +100,9 @@ def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
 
     # save metrics
     df.to_csv(f"{str(run_dir)}/eval.csv")
+    df_stats = pd.concat([df.mean().to_frame().T, df.median().to_frame().T])
+    df_stats.set_index([["mean", "median"]])
+    df_stats.to_csv(f"{str(run_dir)}/eval_stats.csv", index=True)
 
 
 def load_allowed_gpus() -> list[int]:
@@ -108,16 +113,21 @@ def load_allowed_gpus() -> list[int]:
     return gpus
 
 
-def eval_results(run_dir: Path, period: str, epoch: str = "010") -> pd.DataFrame:
+def eval_results(
+    run_dir: Path, period: str, epoch: str = "010"
+) -> tuple[pd.DataFrame, float, float]:
     df = pd.read_csv(
         run_dir / f"{period}" / f"model_epoch{epoch}" / f"{period}_metrics.csv",
         dtype={"basin": str},
     )
     df = df.set_index("basin")
 
+    median = df["NSE"].median()
+    mean = df["NSE"].mean()
+
     # Compute the median NSE from all basins, where discharge observations are available for that period
-    print(f"Median NSE of the {period} period {df['NSE'].median():.3f}")
-    print(f"Mean NSE of the {period} period {df['NSE'].mean():.3f}")
+    print(f"Median NSE of the {period} period {median:.3f}")
+    print(f"Mean NSE of the {period} period {mean:.3f}")
 
     return df
 

@@ -42,6 +42,8 @@ To know more about the arguments run:
 python eval.py -h
 ```
 
+This script will produce two files in the specified run directory: `eval.csv` and `eval_stats.csv`. The first one contains NSE and KGE metrics for each basin and the second file contains mean and median computed on the first file.
+
 
 ## Hindcast evaluation
 

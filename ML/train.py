@@ -36,12 +36,6 @@ def train():
         default=False,
     )
     parser.add_argument(
-        "--evaluate",
-        action="store_true",
-        help="specifies whether to evaluate the model from last epoch",
-        default=False,
-    )
-    parser.add_argument(
         "--gpu",
         type=int,
         help="gpu id",
@@ -86,15 +80,6 @@ def train():
     else:
         # training from scratch
         start_run(config_file=cfg_path, gpu=args.gpu)
-
-    if args.evaluate:
-        run_dir = Path(f"./runs/{sorted(os.listdir('./runs'))[-1]}")
-        evaluate(
-            run_dir,
-            epoch=cfg.epochs,
-            gpu=args.gpu,
-            periods=["train", "validation", "test"],
-        )
 
 
 if __name__ == "__main__":
