@@ -4,6 +4,7 @@
 
 - `conf` contains the configuration files for specific models. The attributes were taken from [here](https://neuralhydrology.readthedocs.io/en/latest/usage/config.html).
 - `eval.ipynb` is an evaluation notebook for models
+- `eval.py` evaluate a model
 - `basins.txt` contains a list of basins on which to train models
 - `finetune_basin.txt` contains a list of bains on which to finetune models
 - `gpu.json` presents a list of gpus allowed to use
@@ -25,6 +26,21 @@ python train.py
 ```
 
 Note it is recommended to see `--help` since it contains important information regarding the program.
+
+
+## Evaluation 
+
+After training evaluation is necessary, hence you should run:
+
+```bash
+python eval.py --run_dir /path/to/run --epoch EPOCH --gpu GPU
+```
+
+To know more about the arguments run:
+
+```bash
+python eval.py -h
+```
 
 
 ## Hindcast evaluation

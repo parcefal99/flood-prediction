@@ -5,6 +5,9 @@ from pathlib import Path
 
 import torch
 from neuralhydrology.nh_run import start_run, continue_run
+from neuralhydrology.utils.config import Config
+
+from eval import evaluate
 
 
 def train():
@@ -30,6 +33,12 @@ def train():
         "--continue_train",
         action="store_true",
         help="specifies to continue train from the last epoch",
+        default=False,
+    )
+    parser.add_argument(
+        "--evaluate",
+        action="store_true",
+        help="specifies whether to evaluate the model from last epoch",
         default=False,
     )
     parser.add_argument(
@@ -62,6 +71,7 @@ def train():
             f"No config file found for specified model `{args.model}`. Consider adding a config for this model or use one of available models, see --help."
         )
 
+    cfg = Config(cfg_path)
     if args.continue_train:
         # continue training from previous epoch
         try:
@@ -76,6 +86,15 @@ def train():
     else:
         # training from scratch
         start_run(config_file=cfg_path, gpu=args.gpu)
+
+    if args.evaluate:
+        run_dir = Path(f"./runs/{sorted(os.listdir('./runs'))[-1]}")
+        evaluate(
+            run_dir,
+            epoch=cfg.epochs,
+            gpu=args.gpu,
+            periods=["train", "validation", "test"],
+        )
 
 
 if __name__ == "__main__":

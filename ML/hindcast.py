@@ -101,6 +101,7 @@ def evaluate_basins(
     cfg.update_config({"device": f"cuda:{gpu}"})
 
     model = load_model(cfg, run_dir, epoch=epoch)
+    model = model.eval()
     mean, std = get_scaler_vals(run_dir)
 
     basins_iter = iter(basins)
