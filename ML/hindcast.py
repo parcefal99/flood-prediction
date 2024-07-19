@@ -16,10 +16,10 @@ import matplotlib.pyplot as plt
 from tqdm import trange
 
 from neuralhydrology.modelzoo import get_model
+from neuralhydrology.datasetzoo import get_dataset
 from neuralhydrology.evaluation import metrics
 from neuralhydrology.utils.config import Config
 from neuralhydrology.datautils.utils import load_scaler
-from neuralhydrology.datasetzoo import BaseDataset, get_dataset
 
 
 sns.set_style("whitegrid")
@@ -215,13 +215,13 @@ def get_cmp(
 
     for i, data in enumerate(loader):
         # wait for one year to pass (to have data for previous year)
-        if i < 365:
+        if i < cfg.seq_length:
             continue
         # stop after the second year
-        # if i == 365 * 2:
+        # if i == cfg.seq_length * 2:
         #     break
 
-        if i == 365:
+        if i == cfg.seq_length:
             year_start = str(data["date"][0][-1]).split("-")[0]
         elif i == len(loader) - 1:
             year_end = str(data["date"][0][-1]).split("-")[0]
@@ -238,14 +238,16 @@ def get_cmp(
 
         # change observed data on predicted data
         # it changes as many values as there are in the `predicted` array
-        if i > 365:
-            x["x_d"][0][-len(predictions) :][:, 8] = torch.tensor(predictions)[-365:]
+        if i > cfg.seq_length:
+            x["x_d"][0][-len(predictions) :][:, 8] = torch.tensor(predictions)[
+                -cfg.seq_length :
+            ]
 
         # obtain and save predictions
         prediction = model(x)
         pred = prediction["y_hat"].detach().cpu().numpy()[0][-1][0]
 
-        if np.isnan(pred) and i > 365:
+        if np.isnan(pred) and i > cfg.seq_length:
             pred = predictions[-1]
         predictions.append(pred)
 

@@ -1,7 +1,7 @@
 # --- Experiment configurations --------------------------------------------------------------------
 
 # experiment name, used as folder name
-experiment_name: ea-lstm
+experiment_name: arlstm
 
 # place to store run directory (if empty runs are stored in $cwd$/runs/)
 run_dir:
@@ -42,7 +42,7 @@ metrics:
 
 # base model type [lstm, ealstm, cudalstm, embcudalstm, shortcutlstm, dropoutlstm, cudalstminitialh]
 # (has to match the if statement in modelzoo/__init__.py)
-model: ealstm
+model: arlstm
 
 # prediction head [regression, mdn, umal]. Define the head specific parameters below
 head: regression
@@ -50,7 +50,7 @@ head: regression
 # ----> General settings <----
 
 # Number of cell states of the LSTM
-hidden_size: 128
+hidden_size: 256
 
 # Initial bias value of the forget gate
 initial_forget_bias: 3
@@ -76,7 +76,7 @@ learning_rate:
     40: 1e-5
 
 # Mini-batch size
-batch_size: 512
+batch_size: 1024
 
 # Number of training epochs
 epochs: 30
@@ -88,7 +88,7 @@ clip_gradient_norm: 1
 predict_last_n: 1
 
 # Length of the input sequence
-seq_length: 270
+seq_length: 365
 
 # Number of parallel workers used in the data pipeline
 num_workers: 8
@@ -131,8 +131,15 @@ dynamic_inputs:
 - hum_mean
 - dew_min
 
-- discharge_prev         
+# - discharge_prev         
 # - level_prev
+
+lagged_features:
+    discharge:
+        - 1
+
+autoregressive_inputs:
+- discharge_shift1
 
 # which columns to use as target
 target_variables:

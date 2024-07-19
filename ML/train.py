@@ -53,7 +53,7 @@ def train():
         type=str,
         help="model to use",
         default="lstm",
-        choices=["lstm", "ealstm", "transformer"],
+        choices=["lstm", "arlstm", "ealstm", "transformer"],
         required=False,
     )
     args = parser.parse_args()
