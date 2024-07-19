@@ -13,8 +13,8 @@ test_basin_file: basins.txt
 
 # training, validation and test time periods (format = 'dd/mm/yyyy')
 train_start_date: '01/01/2000'
-train_end_date: '31/12/2016'
-validation_start_date: '01/01/2017'
+train_end_date: '31/12/2015'
+validation_start_date: '01/01/2016'
 validation_end_date: '31/12/2018'
 test_start_date: '01/01/2019'
 test_end_date: '31/12/2021'
@@ -132,7 +132,7 @@ dynamic_inputs:
 - dew_min
 
 - discharge_prev         
-- level_prev
+# - level_prev
 
 # which columns to use as target
 target_variables:
