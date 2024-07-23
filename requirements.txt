@@ -10,3 +10,4 @@ netCDF4
 cftime
 seaborn
 astral
+openpyxl
