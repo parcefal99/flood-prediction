@@ -239,7 +239,7 @@ def get_cmp(
         # change observed data on predicted data
         # it changes as many values as there are in the `predicted` array
         if i > cfg.seq_length:
-            x["x_d"][0][-len(predictions) :][:, 8] = torch.tensor(predictions)[
+            x["x_d"][0][-len(predictions) :][:, -1] = torch.tensor(predictions)[
                 -cfg.seq_length :
             ]
 
@@ -285,7 +285,7 @@ def plot_cmp(
     sns.lineplot(
         ax=ax, data=df, x="Day", y="Predicted", linestyle="solid", label="Predicted"
     )
-    ax.set_title(f"{basin_id}, {period} period ({year_start}-{year_end})")
+    ax.set_title(f"{basin_id}, {period} period ({str(int(year_start)+1)}-{year_end})")
     ax.set_ylabel("Discharge")
     plt.savefig(run_dir / f"evaluation/plots_log/{period}/{basin_id}.png")
     plt.close()

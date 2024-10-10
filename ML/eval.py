@@ -4,11 +4,19 @@ import argparse
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
+
+import wandb
+import wandb_workspaces.reports.v2 as wr
+import wandb_workspaces.workspaces as ws
 
 from neuralhydrology.nh_run import eval_run
+from neuralhydrology.utils.config import Config
 
 
 def main() -> None:
+    load_dotenv("./.env")
+
     gpus = load_allowed_gpus()
 
     parser = argparse.ArgumentParser(
@@ -72,10 +80,37 @@ def main() -> None:
     if args.test:
         periods.append("test")
 
-    evaluate(run_dir, epoch=args.epoch, gpu=args.gpu, periods=periods)
+    evaluate(
+        run_dir,
+        epoch=args.epoch,
+        gpu=args.gpu,
+        periods=periods,
+        wandb_entity=os.getenv("WANDB_ENTITY"),
+    )
 
 
-def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
+def evaluate(
+    run_dir: Path, epoch: int, gpu: int, periods: list[str], wandb_entity: str
+) -> None:
+
+    with open(Path(run_dir) / "wandb_run.json", "r") as f:
+        wandb_run = json.load(f)
+
+    cfg_path = Path(Path(run_dir) / "config.yml")
+    # check if model config exists
+    if not cfg_path.exists():
+        raise Exception(f"No config file found for specified run directory!")
+
+    cfg = Config(cfg_path)
+
+    # setup wandb
+    run = wandb.init(
+        id=wandb_run["id"],
+        name=wandb_run["name"],
+        project=cfg.experiment_name,
+        entity=wandb_entity,
+        config=cfg.as_dict(),
+    )
 
     epoch = str(epoch)
     if len(epoch) == 1:
@@ -88,7 +123,13 @@ def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
     for i, period in enumerate(periods):
         print(f"Evaluation on {period} period.")
         eval_run(run_dir, period=period, epoch=epoch, gpu=gpu)
-        df_period = eval_results(run_dir, period, epoch=epoch_str)
+        df_period, median, mean = eval_results(run_dir, period, epoch=epoch_str)
+        run.log(
+            {
+                f"{period}/accuracy/NSE_mean": mean,
+                f"{period}/accuracy/NSE_median": median,
+            }
+        )
 
         df_period = df_period.rename(
             columns={"NSE": f"NSE_{period}", "KGE": f"KGE_{period}"}
@@ -103,6 +144,8 @@ def evaluate(run_dir: Path, epoch: int, gpu: int, periods: list[str]) -> None:
     df_stats = pd.concat([df.median().to_frame().T, df.mean().to_frame().T])
     df_stats = df_stats.set_index([["median", "mean"]])
     df_stats.to_csv(f"{str(run_dir)}/eval_stats.csv", index=True)
+
+    run.finish()
 
 
 def load_allowed_gpus() -> list[int]:
@@ -129,7 +172,7 @@ def eval_results(
     print(f"Median NSE of the {period} period {median:.3f}")
     print(f"Mean NSE of the {period} period {mean:.3f}")
 
-    return df
+    return df, median, mean
 
 
 if __name__ == "__main__":

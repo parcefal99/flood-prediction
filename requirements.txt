@@ -11,3 +11,7 @@ cftime
 seaborn
 astral
 openpyxl
+mamba-ssm[causal-conv1d]
+wandb
+wandb-workspaces
+python-dotenv

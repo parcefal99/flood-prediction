@@ -393,7 +393,7 @@ def load_hydro_by_id(basin_id: str, path: str) -> pd.DataFrame:
         raise Exception(f"Hydro station with id `{basin_id}` was not found")
 
     filename = filenames[0]
-    df = pd.read_fwf(os.path.join(path, filename))
+    df = pd.read_csv(os.path.join(path, filename), sep=";")
     # convert date
     df["date"] = pd.to_datetime(df["date"])
     # set date as index

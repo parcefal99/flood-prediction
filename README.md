@@ -29,6 +29,10 @@ Install the required packages into the created virtual environment
 pip install -r requirements.txt
 ```
 
+## WandB Logging
+
+Create `.env` file in `/ML` and add `WANDB_ENTITY` entry.
+
 
 # Data
 
