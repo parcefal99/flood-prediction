@@ -32,7 +32,7 @@ learning_rate:
     2: 5e-5
 
 # Number of training epochs
-epochs: 10
+epochs: 20
 
 finetune_modules:
 - head
