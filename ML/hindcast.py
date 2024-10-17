@@ -73,6 +73,12 @@ def main() -> None:
         choices=["validation", "test"],
         help="period for hindcast",
     )
+    parser.add_argument(
+        "--wandb",
+        action="store_true",
+        help="specifies to log training results to wandb",
+        default=False,
+    )
 
     args = parser.parse_args()
 
@@ -102,17 +108,31 @@ def main() -> None:
         epoch=args.epoch,
         period=args.period,
         gpu=args.gpu,
+        wandb_log=args.wandb,
         wandb_entity=os.getenv("WANDB_ENTITY"),
     )
 
 
 def evaluate_basins(
-    run_dir: Path, basins: list, epoch: int, period: str, gpu: int, wandb_entity: str
+    run_dir: Path,
+    basins: list,
+    epoch: int,
+    period: str,
+    gpu: int,
+    wandb_log: bool,
+    wandb_entity: str,
 ) -> None:
     """Saves plots of observed vs predicted data for specified basins"""
 
-    with open(Path(run_dir) / "wandb_run.json", "r") as f:
-        wandb_run = json.load(f)
+    if wandb_log:
+        wandb_path = Path(Path(run_dir) / "wandb_run.json")
+        if not wandb_path.exists():
+            raise Exception(
+                f"No wandb file found for specified run directory! Probably you have started training without `--wandb` option!"
+            )
+
+        with open(Path(run_dir) / "wandb_run.json", "r") as f:
+            wandb_run = json.load(f)
 
     cfg_path = Path(Path(run_dir) / "config.yml")
     # check if model config exists
@@ -121,14 +141,15 @@ def evaluate_basins(
 
     cfg = Config(cfg_path)
 
-    # setup wandb
-    run = wandb.init(
-        id=wandb_run["id"],
-        name=wandb_run["name"],
-        project=cfg.experiment_name,
-        entity=wandb_entity,
-        config=cfg.as_dict(),
-    )
+    if wandb_log:
+        # setup wandb
+        run = wandb.init(
+            id=wandb_run["id"],
+            name=wandb_run["name"],
+            project=cfg.experiment_name,
+            entity=wandb_entity,
+            config=cfg.as_dict(),
+        )
 
     cfg = get_cfg(run_dir)
     cfg.update_config({"device": f"cuda:{gpu}"})
@@ -149,17 +170,18 @@ def evaluate_basins(
         loader = get_basin_data(cfg, run_dir, basin_id=basin, period=period)
         y_hat, y, year_start, year_end = get_cmp(cfg, model, loader, basin, mean, std)
 
-        run.log(
-            {
-                f"hindcast/{basin}": wandb.plot.line_series(
-                    xs=range(len(y)),
-                    ys=[y, y_hat],
-                    keys=["Observed", "Predicted"],
-                    xname="Days",
-                    title=basin,
-                )
-            }
-        )
+        if wandb_log:
+            run.log(
+                {
+                    f"hindcast/{basin}": wandb.plot.line_series(
+                        xs=range(len(y)),
+                        ys=[y, y_hat],
+                        keys=["Observed", "Predicted"],
+                        xname="Days",
+                        title=basin,
+                    )
+                }
+            )
 
         nse = compute_nse(y_hat, y)
         nse_basins[i] = nse
@@ -177,6 +199,9 @@ def evaluate_basins(
 
         if i == len(basins) - 1:
             t.set_description("Done")
+
+    if wandb_log:
+        run.finish()
 
     nse_basins = pd.DataFrame({"NSE": nse_basins})
     nse_basins_stats = pd.DataFrame(

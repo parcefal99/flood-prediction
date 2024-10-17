@@ -60,6 +60,13 @@ def train():
         choices=["lstm", "arlstm", "ealstm", "transformer", "mamba"],
         required=False,
     )
+    parser.add_argument(
+        "--wandb",
+        action="store_true",
+        help="specifies to log training results to wandb",
+        default=False,
+    )
+    
     args = parser.parse_args()
 
     if args.gpu not in gpus:
@@ -91,11 +98,14 @@ def train():
     else:
         # training from scratch
         start_run(
-            config_file=cfg_path, gpu=args.gpu, wandb_entity=os.getenv("WANDB_ENTITY")
+            config_file=cfg_path,
+            gpu=args.gpu,
+            wandb_log=args.wandb,
+            wandb_entity=os.getenv("WANDB_ENTITY"),
         )
 
 
-def start_run(config_file: Path, wandb_entity: str, gpu: int = None):
+def start_run(config_file: Path, wandb_log: bool, wandb_entity: str, gpu: int = None):
     """Start training a model.
 
     Parameters
@@ -115,10 +125,10 @@ def start_run(config_file: Path, wandb_entity: str, gpu: int = None):
     if gpu is not None and gpu < 0:
         config.device = "cpu"
 
-    start_training(config, wandb_entity)
+    start_training(config, wandb_log, wandb_entity)
 
 
-def start_training(cfg: Config, wandb_entity: str):
+def start_training(cfg: Config, wandb_log: bool, wandb_entity: str):
     """Start model training.
 
     Parameters
@@ -133,7 +143,7 @@ def start_training(cfg: Config, wandb_entity: str):
     else:
         raise ValueError(f"Unknown head {cfg.head}.")
     trainer.initialize_training()
-    trainer.custom_train_and_validate(wandb_entity)
+    trainer.custom_train_and_validate(wandb_log, wandb_entity)
 
 
 class CustomTrainer(BaseTrainer):
@@ -141,29 +151,37 @@ class CustomTrainer(BaseTrainer):
     def __init__(self, cfg: Config):
         super(CustomTrainer, self).__init__(cfg)
 
-    def custom_train_and_validate(self, wandb_entity: str):
+    def custom_train_and_validate(self, wandb_log: bool, wandb_entity: str):
         """Train and validate the model.
 
         Train the model for the number of epochs specified in the run configuration, and perform validation after every
         ``validate_every`` epochs. Model and optimizer state are saved after every ``save_weights_every`` epochs.
         """
 
-        # setup wandb
-        run = wandb.init(
-            project=self.cfg.experiment_name,
-            entity=wandb_entity,
-            config=self.cfg.as_dict(),
-        )
+        if wandb_log:
+            is_discharge = (
+                "Discharge"
+                if "discharge_shift1" in self.cfg.dynamic_inputs
+                else "No Discharge"
+            )
 
-        wandb_run = {
-            "id": run.id,
-            "name": run.name,
-        }
+            # setup wandb
+            run = wandb.init(
+                project=self.cfg.experiment_name,
+                entity=wandb_entity,
+                config=self.cfg.as_dict(),
+                tags=[is_discharge],
+            )
 
-        with open(Path(self.cfg.run_dir) / "wandb_run.json", "w") as f:
-            json.dump(wandb_run, f, ensure_ascii=False, indent=4)
+            wandb_run = {
+                "id": run.id,
+                "name": run.name,
+            }
 
-        run.watch(self.model)
+            with open(Path(self.cfg.run_dir) / "wandb_run.json", "w") as f:
+                json.dump(wandb_run, f, ensure_ascii=False, indent=4)
+
+            run.watch(self.model)
 
         for epoch in range(self._epoch + 1, self._epoch + self.cfg.epochs + 1):
             if epoch in self.cfg.learning_rate.keys():
@@ -174,8 +192,9 @@ class CustomTrainer(BaseTrainer):
             self._train_epoch(epoch=epoch)
             avg_losses = self.experiment_logger.summarise()
 
-            # wandb log training
-            run.log({"training": avg_losses})
+            if wandb_log:
+                # wandb log training
+                run.log({"training": avg_losses})
 
             loss_str = ", ".join(f"{k}: {v:.5f}" for k, v in avg_losses.items())
             LOGGER.info(f"Epoch {epoch} average loss: {loss_str}")
@@ -195,8 +214,9 @@ class CustomTrainer(BaseTrainer):
 
                 valid_metrics = self.experiment_logger.summarise()
 
-                # wandb log validation
-                run.log({"validation": valid_metrics})
+                if wandb_log:
+                    # wandb log validation
+                    run.log({"validation": valid_metrics})
 
                 print_msg = f"Epoch {epoch} average validation loss: {valid_metrics['avg_total_loss']:.5f}"
                 if self.cfg.metrics:
@@ -208,7 +228,8 @@ class CustomTrainer(BaseTrainer):
                     )
                     LOGGER.info(print_msg)
 
-        run.finish()
+        if wandb_log:
+            run.finish()
 
         # make sure to close tensorboard to avoid losing the last epoch
         if self.cfg.log_tensorboard:

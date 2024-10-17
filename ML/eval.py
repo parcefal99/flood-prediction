@@ -59,6 +59,12 @@ def main() -> None:
         help="evaulate on test period",
         default=True,
     )
+    parser.add_argument(
+        "--wandb",
+        action="store_true",
+        help="specifies to log training results to wandb",
+        default=False,
+    )
 
     args = parser.parse_args()
 
@@ -85,16 +91,29 @@ def main() -> None:
         epoch=args.epoch,
         gpu=args.gpu,
         periods=periods,
+        wandb_log=args.wandb,
         wandb_entity=os.getenv("WANDB_ENTITY"),
     )
 
 
 def evaluate(
-    run_dir: Path, epoch: int, gpu: int, periods: list[str], wandb_entity: str
+    run_dir: Path,
+    epoch: int,
+    gpu: int,
+    periods: list[str],
+    wandb_log: bool,
+    wandb_entity: str,
 ) -> None:
 
-    with open(Path(run_dir) / "wandb_run.json", "r") as f:
-        wandb_run = json.load(f)
+    if wandb_log:
+        wandb_path = Path(Path(run_dir) / "wandb_run.json")
+        if not wandb_path.exists():
+            raise Exception(
+                f"No wandb file found for specified run directory! Probably you have started training without `--wandb` option!"
+            )
+
+        with open(Path(run_dir) / "wandb_run.json", "r") as f:
+            wandb_run = json.load(f)
 
     cfg_path = Path(Path(run_dir) / "config.yml")
     # check if model config exists
@@ -103,14 +122,14 @@ def evaluate(
 
     cfg = Config(cfg_path)
 
-    # setup wandb
-    run = wandb.init(
-        id=wandb_run["id"],
-        name=wandb_run["name"],
-        project=cfg.experiment_name,
-        entity=wandb_entity,
-        config=cfg.as_dict(),
-    )
+    if wandb_log:
+        # setup wandb
+        run = wandb.init(
+            id=wandb_run["id"],
+            name=wandb_run["name"],
+            project=cfg.experiment_name,
+            entity=wandb_entity,
+        )
 
     epoch = str(epoch)
     if len(epoch) == 1:
@@ -124,12 +143,14 @@ def evaluate(
         print(f"Evaluation on {period} period.")
         eval_run(run_dir, period=period, epoch=epoch, gpu=gpu)
         df_period, median, mean = eval_results(run_dir, period, epoch=epoch_str)
-        run.log(
-            {
-                f"{period}/accuracy/NSE_mean": mean,
-                f"{period}/accuracy/NSE_median": median,
-            }
-        )
+
+        if wandb_log:
+            run.log(
+                {
+                    f"{period}/accuracy/NSE_mean": mean,
+                    f"{period}/accuracy/NSE_median": median,
+                }
+            )
 
         df_period = df_period.rename(
             columns={"NSE": f"NSE_{period}", "KGE": f"KGE_{period}"}
@@ -145,7 +166,8 @@ def evaluate(
     df_stats = df_stats.set_index([["median", "mean"]])
     df_stats.to_csv(f"{str(run_dir)}/eval_stats.csv", index=True)
 
-    run.finish()
+    if wandb_log:
+        run.finish()
 
 
 def load_allowed_gpus() -> list[int]:
