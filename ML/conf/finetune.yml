@@ -4,21 +4,41 @@
 experiment_name: finetune
 
 # files to specify training, validation and test basins (relative to code root or absolute path)
-train_basin_file: finetune_basin.txt
-validation_basin_file: finetune_basin.txt
-test_basin_file: finetune_basin.txt
+train_basin_file: basins_kz.txt
+validation_basin_file: basins_kz.txt
+test_basin_file: basins_kz.txt
+
+# training, validation and test time periods (format = 'dd/mm/yyyy')
+train_start_date: '01/01/2000'
+train_end_date: '31/12/2015'
+validation_start_date: '01/01/2016'
+validation_end_date: '31/12/2018'
+test_start_date: '01/01/2019'
+test_end_date: '31/12/2021'
+
+# which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
+device: cuda:12
+
+# --- Validation configuration ---------------------------------------------------------------------
+
+# specify how many random basins to use for validation
+validate_n_random_basins: 42
 
 # --- Training configuration -----------------------------------------------------------------------
 
 # specify learning rates to use starting at specific epochs (0 is the initial learning rate)
 learning_rate:
-    0: 1e-3
-    5: 5e-4
-    20: 1e-6
+    0: 5e-4
+    2: 5e-5
 
 # Number of training epochs
-epochs: 50
+epochs: 20
 
 finetune_modules:
 - head
 - lstm
+
+# --- Data configurations --------------------------------------------------------------------------
+
+# Path to CAMELS data set
+data_dir: ../data/CAMELS_KZ
