@@ -170,3 +170,5 @@ output_logs/
 data
 runs
 wandb
+
+.vscode

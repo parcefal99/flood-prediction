@@ -127,6 +127,7 @@ def evaluate(
         run = wandb.init(
             id=wandb_run["id"],
             name=wandb_run["name"],
+            config=cfg.as_dict(),
             project=cfg.experiment_name,
             entity=wandb_entity,
         )
