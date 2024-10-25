@@ -107,6 +107,7 @@ class CustomTrainer(BaseTrainer):
             # setup wandb
             run = wandb.init(
                 project=self.cfg.experiment_name,
+                name = str(self.cfg.run_dir).split('/')[-1],
                 entity=wandb_entity,
                 config=self.cfg.as_dict(),
                 tags=[is_discharge],
