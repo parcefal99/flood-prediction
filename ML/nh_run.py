@@ -32,6 +32,41 @@ def start_run(config: Config, wandb_log: bool, wandb_entity: str, gpu: int = Non
     start_training(config, wandb_log, wandb_entity)
 
 
+def finetune(config_base: Config, config_finetune: Config, wandb_log: bool, wandb_entity: str, gpu: int = None):
+    """Finetune a pre-trained model.
+
+    Parameters
+    ----------
+    config_file : Path, optional
+        Path to an additional config file. Each config argument in this file will overwrite the original run config.
+        The config file for finetuning must contain the argument `base_run_dir`, pointing to the folder of the 
+        pre-trained model, as well as 'finetune_modules' to indicate which model parts will be trained during
+        fine-tuning.
+    gpu : int, optional
+        GPU id to use. Will override config argument 'device'. A value smaller than zero indicates CPU.
+
+    """
+    # load finetune config and check for a non-empty list of finetune_modules
+    if not config_finetune.finetune_modules:
+        raise ValueError("For finetuning, at least one model part has to be specified by 'finetune_modules'.")
+
+    # extract base run dir, load base run config and combine with the finetune arguments
+    config_base.update_config({'run_dir': None, 'experiment_name': None})
+    config_base.update_config(config_finetune.as_dict())
+    config_base.is_finetuning = True
+
+    # if the base run was a continue_training run, we need to override the continue_training flag from its config.
+    config_base.is_continue_training = False
+
+    # check if a GPU has been specified as command line argument. If yes, overwrite config
+    if gpu is not None and gpu >= 0:
+        config_base.device = f"cuda:{gpu}"
+    if gpu is not None and gpu < 0:
+        config_base.device = "cpu"
+
+    start_training(config_base, wandb_log, wandb_entity)
+
+
 def start_training(cfg: Config, wandb_log: bool, wandb_entity: str):
     """Start model training.
 
