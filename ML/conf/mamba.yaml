@@ -1,15 +1,15 @@
 # --- Experiment configurations --------------------------------------------------------------------
 
 # experiment name, used as folder name
-experiment_name: lstm
+experiment_name: mamba
 
 # place to store run directory (if empty runs are stored in $cwd$/runs/)
 run_dir:
 
 # files to specify training, validation and test basins (relative to code root or absolute path)
-train_basin_file: basins.txt
-validation_basin_file: basins.txt
-test_basin_file: basins.txt
+train_basin_file: basins/basins_96.txt
+validation_basin_file: basins/basins_96.txt
+test_basin_file: basins/basins_96.txt
 
 # training, validation and test time periods (format = 'dd/mm/yyyy')
 train_start_date: '01/01/2000'
@@ -23,7 +23,7 @@ test_end_date: '31/12/2021'
 seed: 42
 
 # which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
-device: cuda:5
+device: cuda:0
 
 # --- Validation configuration ---------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ device: cuda:5
 validate_every: 1
 
 # specify how many random basins to use for validation
-validate_n_random_basins: 42
+validate_n_random_basins: 96
 
 # specify which metrics to calculate during validation (see codebase.evaluation.metrics)
 metrics:
@@ -42,27 +42,46 @@ metrics:
 
 # base model type [lstm, ealstm, cudalstm, embcudalstm, shortcutlstm, dropoutlstm, cudalstminitialh]
 # (has to match the if statement in modelzoo/__init__.py)
-model: cudalstm
+model: mamba
 
-# prediction head [regression, mdn, umal]. Define the head specific parameters below
-head: regression
+# statics_embedding:
+#   type: fc
+#   hiddens: 
+#     - 32
+#     - 20
+#     - 64
+#   activation: tanh
+#   dropout: 0.0
 
-# ----> General settings <----
 
-# Number of cell states of the LSTM
-hidden_size: 128
+# dynamics_embedding:
+#   type: fc
+#   # define number of neurons per layer in the FC network used as embedding network
+#   hiddens:
+#     - 32
+#     - 20
+#     - 64
+#   # activation function of embedding network
+#   activation: tanh
+#   # dropout applied to embedding network
+#   dropout: 0.0
 
-# Initial bias value of the forget gate
-initial_forget_bias: 3
-
-# Dropout applied to the output of the LSTM
-output_dropout: 0.4
 
 output_activation: linear
 
+head: "regression"
+
+mamba_d_state: 32
+mamba_d_conv: 8
+mamba_expand: 2
+
+
+hidden_size: 64
+
+
 # --- Training configuration -----------------------------------------------------------------------
 
-# specify optimizer [Adam, Adadelta]
+# specify optimizer [Adam, AdamW, Adadelta]
 optimizer: Adam
 
 # specify loss [MSE, NSE, RMSE, UMALLoss, MDNLoss]
@@ -70,16 +89,16 @@ loss: NSE
 
 # specify learning rates to use starting at specific epochs (0 is the initial learning rate)
 learning_rate:
-    0: 1e-2
-    10: 1e-3
-    30: 1e-4
-    40: 1e-5
+  0: 1e-3
+  1: 1e-3
+  5: 1e-4
+  10: 1e-5
 
 # Mini-batch size
 batch_size: 1024
 
 # Number of training epochs
-epochs: 20
+epochs: 15
 
 # If True, clips norm of gradients
 clip_gradient_norm: 1
@@ -110,7 +129,8 @@ save_validation_results: True
 dataset: generic
 
 # Path to CAMELS data set
-data_dir: ../data/CAMELS_KZ
+# data_dir: ../data/CAMELS_KZ
+data_dir: ../data/fancy_dataset
 
 # Forcing product [daymet, maurer, maurer_extended, nldas, nldas_extended]
 # can be either a list of forcings or a single forcing product
@@ -121,24 +141,70 @@ data_dir: ../data/CAMELS_KZ
 # Note: In case of multiple input forcing products, you have to append the forcing product behind
 # each variable. E.g. 'prcp(mm/day)' of the daymet product is 'prcp(mm/day)_daymet'
 dynamic_inputs:
-- prcp
+
+# CAMELS_KZ
+# - prcp
+# - srad
+# - t_max
+# - t_min
+# - pp_mean
+
+# - sat_max
+# - hum_mean
+# - dew_min
+
+
+# fancy_dataset
 - srad
 - t_max
 - t_min
-- pp_mean
+- prcp_era
+- vp1
+- dew_mean
+- wind_speed
 
-- sat_max
-- hum_mean
-- dew_min
 
-- discharge_prev
+- discharge_shift1
+
+# - discharge_prev
 # - level_prev
+
+lagged_features:
+    discharge:
+        - 1
 
 # which columns to use as target
 target_variables:
 - discharge
 
 static_attributes:
+
+# CAMELS_KZ
+
+# - elev_mean
+# - slope_mean
+# - area_gages2
+# - forest_frac
+# - lai_max
+# - lai_diff
+# - gvf_max
+# - gvf_diff
+# - soil_conductivity
+# - max_water_content
+# - sand_frac
+# - silt_frac
+# - clay_frac
+# - p_mean
+# - pet_mean
+# - aridity
+# - p_seasonality
+# - frac_snow_daily
+# - high_prec_freq
+# - high_prec_dur
+# - low_prec_freq
+# - low_prec_dur
+
+# fancy_dataset
 - elev_mean
 - slope_mean
 - area_gages2
@@ -152,12 +218,37 @@ static_attributes:
 - sand_frac
 - silt_frac
 - clay_frac
-- p_mean
-- pet_mean
-- aridity
-- p_seasonality
-- frac_snow_daily
-- high_prec_freq
-- high_prec_dur
-- low_prec_freq
-- low_prec_dur
+- p_mean_era
+# - pet_mean
+- aridity_era
+- p_seasonality_era
+- frac_snow_daily_era
+- high_prec_freq_era
+- high_prec_dur_era
+- low_prec_freq_era
+- low_prec_dur_era
+
+
+wandb: False
+
+gpu: 0
+
+defaults:
+  - _self_
+  # - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled 
+
+hydra:
+
+  verbose: True
+
+  sweeper:
+    params:
+      mamba_d_state: 32,64,128
+      mamba_d_conv: 4,8,64
+      mamba_expand: 1,2,4
+      hidden_size: 64,128,256
+
+  output_subdir: null  
+  run:  
+    dir: .

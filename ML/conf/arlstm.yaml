@@ -1,7 +1,7 @@
 # --- Experiment configurations --------------------------------------------------------------------
 
 # experiment name, used as folder name
-experiment_name: transformer
+experiment_name: arlstm
 
 # place to store run directory (if empty runs are stored in $cwd$/runs/)
 run_dir:
@@ -42,62 +42,44 @@ metrics:
 
 # base model type [lstm, ealstm, cudalstm, embcudalstm, shortcutlstm, dropoutlstm, cudalstminitialh]
 # (has to match the if statement in modelzoo/__init__.py)
-model: transformer
+model: arlstm
 
-statics_embedding:
-  type: fc
-  hiddens: 
-    - 32
-    - 20
-    - 64
-  activation: tanh
-  dropout: 0.0
+# prediction head [regression, mdn, umal]. Define the head specific parameters below
+head: regression
 
+# ----> General settings <----
 
-dynamics_embedding:
-  type: fc
-  # define number of neurons per layer in the FC network used as embedding network
-  hiddens:
-    - 32
-    - 20
-    - 64
-  # activation function of embedding network
-  activation: tanh
-  # dropout applied to embedding network
-  dropout: 0.0
+# Number of cell states of the LSTM
+hidden_size: 256
 
+# Initial bias value of the forget gate
+initial_forget_bias: 3
+
+# Dropout applied to the output of the LSTM
+output_dropout: 0.3
 
 output_activation: linear
 
-head: "regression"
-
-transformer_positional_encoding_type: sum
-transformer_positional_dropout: 0
-transformer_nheads: 4
-transformer_dim_feedforward: 32
-transformer_dropout: 0
-transformer_nlayers: 4
-
-hidden_size: 64
-
 # --- Training configuration -----------------------------------------------------------------------
 
-# specify optimizer [Adam, AdamW, Adadelta]
+# specify optimizer [Adam, Adadelta]
 optimizer: Adam
 
 # specify loss [MSE, NSE, RMSE, UMALLoss, MDNLoss]
-loss: MSE
+loss: NSE
 
 # specify learning rates to use starting at specific epochs (0 is the initial learning rate)
 learning_rate:
-  0: 1e-3
-  1: 1e-3
+    0: 1e-2
+    10: 1e-3
+    30: 1e-4
+    40: 1e-5
 
 # Mini-batch size
 batch_size: 1024
 
 # Number of training epochs
-epochs: 10
+epochs: 30
 
 # If True, clips norm of gradients
 clip_gradient_norm: 1
@@ -149,9 +131,15 @@ dynamic_inputs:
 - hum_mean
 - dew_min
 
-- discharge_prev
+# - discharge_prev         
 # - level_prev
 
+lagged_features:
+    discharge:
+        - 1
+
+autoregressive_inputs:
+- discharge_shift1
 
 # which columns to use as target
 target_variables:
@@ -180,3 +168,25 @@ static_attributes:
 - high_prec_dur
 - low_prec_freq
 - low_prec_dur
+
+
+wandb: False
+
+gpu: 0
+
+defaults:
+  - _self_
+  # - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled 
+
+hydra:
+
+  verbose: True
+
+  sweeper:
+    params:
+      hidden_size: 64,128
+
+  output_subdir: null  
+  run:  
+    dir: .

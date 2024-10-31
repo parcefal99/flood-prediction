@@ -2,10 +2,8 @@ import os
 import json
 import logging
 import argparse
-import datetime
 from pathlib import Path
 
-import hydra
 import torch
 from dotenv import load_dotenv
 
@@ -18,7 +16,9 @@ from nh_run import start_run
 
 LOGGER = logging.getLogger(__name__)
 
+
 def run():
+    
     load_dotenv(dotenv_path=".env")
 
     # check if CUDA available
@@ -69,13 +69,8 @@ def run():
 
     args = parser.parse_args()
 
-    if args.gpu not in gpus:
-        raise Exception(
-            f"Specified prohibited gpu id: `{args.gpu}`, allowed gpu ids are: `{gpus}`"
-        )
-
     # path to the config file
-    config_file = Path(f"./conf/{args.model}.yml")
+    config_file = Path(f"./conf/{args.model}.yaml")
     # check if model config exists
     if not config_file.exists():
         raise Exception(
@@ -83,6 +78,11 @@ def run():
         )
 
     cfg = Config(config_file)
+
+    if args.gpu not in gpus:
+        raise Exception(
+            f"Specified prohibited gpu id: `{cfg.gpu}`, allowed gpu ids are: `{gpus}`"
+        )
 
     start_run(
         config=cfg,

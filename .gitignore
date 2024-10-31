@@ -169,6 +169,7 @@ output_logs/
 # Project
 data
 runs
+multirun
 wandb
 
 .vscode

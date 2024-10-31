@@ -161,3 +161,25 @@ static_attributes:
 - high_prec_dur
 - low_prec_freq
 - low_prec_dur
+
+
+wandb: False
+
+gpu: 0
+
+defaults:
+  - _self_
+  # - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled 
+
+hydra:
+
+  verbose: True
+
+  sweeper:
+    params:
+      hidden_size: 64,128
+
+  output_subdir: null  
+  run:  
+    dir: .
