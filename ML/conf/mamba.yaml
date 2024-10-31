@@ -229,7 +229,7 @@ static_attributes:
 - low_prec_dur_era
 
 
-wandb: False
+wandb: True
 
 gpu: 0
 

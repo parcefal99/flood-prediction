@@ -163,7 +163,7 @@ static_attributes:
 - low_prec_dur
 
 
-wandb: False
+wandb: True
 
 gpu: 0
 
