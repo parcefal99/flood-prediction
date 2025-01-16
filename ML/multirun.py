@@ -1,18 +1,16 @@
 import os
 import json
 import logging
-import argparse
-from pathlib import Path
 
-import hydra.core
-import hydra.core.hydra_config
 import torch
+
 from dotenv import load_dotenv
 
 import hydra
+import hydra.core
+import hydra.core.hydra_config
 from omegaconf import DictConfig, OmegaConf
 
-from neuralhydrology.nh_run import continue_run
 from neuralhydrology.utils.config import Config
 
 from eval import evaluate
@@ -42,7 +40,15 @@ def run(cfg: DictConfig):
 
     gpu = cfg.pop("gpu")
     wandb_log = cfg.pop("wandb")
+    is_discharge = cfg.pop("discharge")
 
+    # load dataset config
+    dataset = cfg.pop("dataset")
+    dataset = OmegaConf.load(f"./conf/datasets/{dataset}.yaml")
+    # load base config
+    base = OmegaConf.load("./conf/base.yaml")
+
+    # get sweeper parameters
     hydra_cfg = hydra.core.hydra_config.HydraConfig.get()
     sweeper_params = hydra_cfg.sweeper.params
 
@@ -51,7 +57,13 @@ def run(cfg: DictConfig):
         current_params[p] = cfg[p]
 
     print(f"Running job with the following parameters: {current_params}")
-        
+
+    cfg = OmegaConf.merge(cfg, base, dataset)
+    cfg = OmegaConf.to_object(cfg)
+
+    if is_discharge:
+        cfg["dynamic_inputs"].append("discharge_shift1")
+
     cfg = Config(cfg)
 
     if gpu not in gpus:
@@ -59,6 +71,7 @@ def run(cfg: DictConfig):
             f"Specified prohibited gpu id: `{gpu}`, allowed gpu ids are: `{gpus}`"
         )
 
+    # training with validations
     start_run(
         config=cfg,
         gpu=gpu,
@@ -69,6 +82,7 @@ def run(cfg: DictConfig):
     # run evaluations
     periods: list[str] = ["train", "validation", "test"]
 
+    # final evaluation over the specified periods
     evaluate(
         run_dir=cfg.run_dir,
         epoch=cfg.epochs,

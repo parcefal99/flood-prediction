@@ -123,6 +123,9 @@ class CustomTrainer(BaseTrainer):
 
             run.watch(self.model)
 
+        # path to save nse for each epoch
+        validation_log_path = Path(self.cfg.run_dir) / "validation_nse.csv"
+
         for epoch in range(self._epoch + 1, self._epoch + self.cfg.epochs + 1):
             if epoch in self.cfg.learning_rate.keys():
                 LOGGER.info(f"Setting learning rate to {self.cfg.learning_rate[epoch]}")
@@ -167,6 +170,15 @@ class CustomTrainer(BaseTrainer):
                         if k != "avg_total_loss"
                     )
                     LOGGER.info(print_msg)
+                    if "NSE" in valid_metrics:
+
+                        if not validation_log_path.exists():
+                        # create file to save NSE after each epoch
+                            with open(validation_log_path, "w") as f:
+                                f.write(f"epoch;NSE\n")
+                        
+                        with open(validation_log_path, "a") as f:
+                            f.write(f"{epoch};{valid_metrics['NSE']}\n")
 
         if wandb_log:
             run.finish()

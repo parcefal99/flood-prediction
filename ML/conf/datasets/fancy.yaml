@@ -1,0 +1,55 @@
+train_basin_file: basins/basins_96.txt
+validation_basin_file: basins/basins_96.txt
+test_basin_file: basins/basins_96.txt
+
+validate_n_random_basins: 96
+
+data_dir: ../data/fancy_dataset
+
+# --- Data configurations --------------------------------------------------------------------------
+
+dataset: generic
+
+# which columns to use as target
+target_variables:
+- discharge
+
+dynamic_inputs:
+- prcp_era
+- srad
+- t_max
+- t_min
+- vp1
+
+# - dew_mean
+# - wind_speed
+
+# - discharge_shift1
+
+lagged_features:
+    discharge:
+        - 1
+
+static_attributes:
+- elev_mean
+- slope_mean
+- area_gages2
+- forest_frac
+- lai_max
+- lai_diff
+- gvf_max
+- gvf_diff
+- soil_conductivity
+- max_water_content
+- sand_frac
+- silt_frac
+- clay_frac
+- p_mean_era
+- pet_mean
+- aridity_era
+- p_seasonality_era
+- frac_snow_daily_era
+- high_prec_freq_era
+- high_prec_dur_era
+- low_prec_freq_era
+- low_prec_dur_era

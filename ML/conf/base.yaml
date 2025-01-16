@@ -1,0 +1,53 @@
+# --- Experiment configurations --------------------------------------------------------------------
+
+# place to store run directory (if empty runs are stored in $cwd$/runs/)
+run_dir:
+
+# training, validation and test time periods (format = 'dd/mm/yyyy')
+train_start_date: '01/10/2011'
+train_end_date: '30/09/2019'
+validation_start_date: '01/10/2008'
+validation_end_date: '30/09/2011'
+test_start_date: '01/10/2019'
+test_end_date: '31/12/2022'
+
+# fixed seed, leave empty to use a random seed
+seed: 42
+
+# which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
+device: cuda:0
+
+
+# --- Validation configuration ---------------------------------------------------------------------
+
+# specify after how many epochs to perform validation
+validate_every: 1
+
+# specify which metrics to calculate during validation (see codebase.evaluation.metrics)
+metrics:
+- NSE
+- KGE
+
+
+# --- Training configuration -----------------------------------------------------------------------
+
+# If True, clips norm of gradients
+clip_gradient_norm: 1
+
+# Defines which time steps are used to calculate the loss. Can't be larger than seq_length
+predict_last_n: 1
+
+# Number of parallel workers used in the data pipeline
+num_workers: 8
+
+# Log the training loss every n steps
+log_interval: 5
+
+# If true, writes logging results into tensorboard file
+log_tensorboard: True
+
+# Save model weights every n epochs
+save_weights_every: 1
+
+# Store the results of the validation to disk
+save_validation_results: True
