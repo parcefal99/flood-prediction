@@ -71,7 +71,10 @@ hydra:
   verbose: True
   sweeper:
     params:
-      hidden_size: 64
+      hidden_size: 32,64,128,256
+      seq_length: 180,270,365
+      optimizer: Adam,AdamW
+      output_dropout: 0.3
 
   output_subdir: null  
   run:  

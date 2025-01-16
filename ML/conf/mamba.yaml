@@ -72,7 +72,7 @@ seq_length: 365
 # --- Data configurations --------------------------------------------------------------------------
 
 # specify dataset version [camels_kz, fancy_dataset]
-dataset: fancy_dataset
+dataset: fancy
 
 
 # --- Side configurations --------------------------------------------------------------------------
@@ -94,11 +94,10 @@ hydra:
   verbose: True
   sweeper:
     params:
-      # mamba_d_state: 32,64,128
-      # mamba_d_conv: 4,8,64
-      # mamba_expand: 1,2,4
-      # hidden_size: 64,128,256
-      hidden_size: 1
+      mamba_d_state: 32,64,128
+      mamba_d_conv: 4,8,64
+      mamba_expand: 1,2,4
+      hidden_size: 64,128,256
 
   output_subdir: null  
   run:  
