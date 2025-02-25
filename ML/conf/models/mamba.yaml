@@ -82,7 +82,7 @@ dataset: sigma
 
 # --- Side configurations --------------------------------------------------------------------------
 
-wandb: False
+wandb: True
 
 discharge: True
 
