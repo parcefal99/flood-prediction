@@ -1,0 +1,86 @@
+# --- Experiment configurations --------------------------------------------------------------------
+
+# experiment name, used as folder name
+experiment_name: arlstm
+
+# fixed seed, leave empty to use a random seed
+seed: 42
+
+# --- Model configuration --------------------------------------------------------------------------
+
+# base model type [lstm, ealstm, cudalstm, embcudalstm, shortcutlstm, dropoutlstm, cudalstminitialh]
+# (has to match the if statement in modelzoo/__init__.py)
+model: arlstm
+
+# prediction head [regression, mdn, umal]. Define the head specific parameters below
+head: regression
+
+# ----> General settings <----
+
+# Number of cell states of the LSTM
+hidden_size: 256
+
+# Initial bias value of the forget gate
+initial_forget_bias: 3
+
+# Dropout applied to the output of the LSTM
+output_dropout: 0.3
+
+output_activation: linear
+
+# --- Training configuration -----------------------------------------------------------------------
+
+# specify optimizer [Adam, Adadelta]
+optimizer: Adam
+
+# specify loss [MSE, NSE, RMSE, UMALLoss, MDNLoss]
+loss: NSE
+
+# specify learning rates to use starting at specific epochs (0 is the initial learning rate)
+learning_rate:
+    0: 1e-2
+    10: 1e-3
+    30: 1e-4
+    40: 1e-5
+
+# Mini-batch size
+batch_size: 2048
+
+# Number of training epochs
+epochs: 30
+
+# Length of the input sequence
+seq_length: 365
+
+
+# --- Data configurations --------------------------------------------------------------------------
+
+# specify dataset version [beta, sigma]
+dataset: sigma
+
+
+# --- Side configurations --------------------------------------------------------------------------
+
+wandb: True
+
+discharge: True
+
+gpu: 0
+
+
+# --- Hydra configurations -------------------------------------------------------------------------
+
+defaults:
+  - _self_
+  # - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled 
+
+hydra:
+  verbose: True
+  sweeper:
+    params:
+      hidden_size: 64,128
+
+  output_subdir: null  
+  run:  
+    dir: .

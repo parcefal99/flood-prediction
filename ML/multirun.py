@@ -1,5 +1,4 @@
 import os
-import json
 import logging
 
 import torch
@@ -20,8 +19,8 @@ from nh_run import start_run
 LOGGER = logging.getLogger(__name__)
 
 
-@hydra.main(config_name=None, config_path="conf", version_base=None)
-def run(cfg: DictConfig):
+@hydra.main(config_name=None, config_path="conf/models", version_base=None)
+def run(cfg: DictConfig) -> None:
 
     load_dotenv(dotenv_path=".env")
 
@@ -30,11 +29,6 @@ def run(cfg: DictConfig):
         pass
     else:
         raise Exception("No GPU found!")
-
-    # load allowed GPU ids
-    f = open("gpu.json")
-    gpus = json.load(f)
-    f.close()
 
     cfg = OmegaConf.to_object(cfg)
 
@@ -65,11 +59,6 @@ def run(cfg: DictConfig):
         cfg["dynamic_inputs"].append("discharge_shift1")
 
     cfg = Config(cfg)
-
-    if gpu not in gpus:
-        raise Exception(
-            f"Specified prohibited gpu id: `{gpu}`, allowed gpu ids are: `{gpus}`"
-        )
 
     # training with validations
     start_run(

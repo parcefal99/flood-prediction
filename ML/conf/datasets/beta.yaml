@@ -1,6 +1,6 @@
-train_basin_file: basins/basins_sigma_44.txt
-validation_basin_file: basins/basins_sigma_44.txt
-test_basin_file: basins/basins_sigma_44.txt
+train_basin_file: basins/basins_beta_44.txt
+validation_basin_file: basins/basins_beta_44.txt
+test_basin_file: basins/basins_beta_44.txt
 
 validate_n_random_basins: 44
 
@@ -23,8 +23,6 @@ dynamic_inputs:
 
 # - dew_mean
 # - wind_speed
-
-# - discharge_shift1
 
 lagged_features:
     discharge:

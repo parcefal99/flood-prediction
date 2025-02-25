@@ -1,7 +1,7 @@
 # --- Experiment configurations --------------------------------------------------------------------
 
 # place to store run directory (if empty runs are stored in $cwd$/runs/)
-run_dir:
+run_dir: "runs/"
 
 # training, validation and test time periods (format = 'dd/mm/yyyy')
 train_start_date: '01/10/2011'
@@ -10,9 +10,15 @@ validation_start_date: '01/10/2008'
 validation_end_date: '30/09/2011'
 test_start_date: '01/10/2019'
 test_end_date: '31/12/2022'
+# train_start_date: '01/10/2012'
+# train_end_date: '31/12/2022'
+# validation_start_date: '01/10/2008'
+# validation_end_date: '30/09/2012'
+# test_start_date: '01/10/2004'
+# test_end_date: '30/09/2008'
 
 # fixed seed, leave empty to use a random seed
-seed: 42
+# seed: 42
 
 # which GPU (id) to use [in format of cuda:0, cuda:1 etc, or cpu or None]
 device: cuda:0

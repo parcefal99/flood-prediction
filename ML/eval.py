@@ -7,8 +7,6 @@ import pandas as pd
 from dotenv import load_dotenv
 
 import wandb
-import wandb_workspaces.reports.v2 as wr
-import wandb_workspaces.workspaces as ws
 
 from neuralhydrology.nh_run import eval_run
 from neuralhydrology.utils.config import Config
@@ -16,8 +14,6 @@ from neuralhydrology.utils.config import Config
 
 def main() -> None:
     load_dotenv("./.env")
-
-    gpus = load_allowed_gpus()
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -38,7 +34,7 @@ def main() -> None:
         "--gpu",
         type=int,
         help="gpu id",
-        default=gpus[0],
+        default=0,
         required=False,
     )
     parser.add_argument(
@@ -67,11 +63,6 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-
-    if args.gpu not in gpus:
-        raise Exception(
-            f"Specified prohibited gpu id: `{args.gpu}`, allowed gpu ids are: `{gpus}`"
-        )
 
     run_dir = Path(args.run_dir)
     # check whether run_dir exists
@@ -169,14 +160,6 @@ def evaluate(
 
     if wandb_log:
         run.finish()
-
-
-def load_allowed_gpus() -> list[int]:
-    # load allowed GPU ids
-    f = open("gpu.json")
-    gpus = json.load(f)
-    f.close()
-    return gpus
 
 
 def eval_results(

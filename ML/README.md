@@ -3,12 +3,10 @@
 ## Structure
 
 - `conf` contains the configuration files for specific models. The attributes were taken from [here](https://neuralhydrology.readthedocs.io/en/latest/usage/config.html).
-- `eval.ipynb` is an evaluation notebook for models
 - `eval.py` evaluate a model
-- `basins.txt` contains a list of basins on which to train models
+- `basins_sigma_51.txt` contains a list of basins on which to train models
 - `finetune_basin.txt` contains a list of bains on which to finetune models
-- `gpu.json` presents a list of gpus allowed to use
-- `train.py` training script
+- `multirun.py` training script
 - `hindcast.py` script to plot observed vs predicted values
 
 ## Training
@@ -16,16 +14,22 @@
 To see info about the program and available options execute the script with `-h` (or `--help`) flag:
 
 ```bash
-python train.py -h
+python multirun.py -h
 ```
 
-To run the training with default options execute:
+To run the training execute:
 
 ```bash
-python train.py
+python multirun.py --config-name <model_name> -m dataset=<dataset_name> discharge=[true|false] gpu=<number> experiment_name=<name_of_experiment>
 ```
 
-Note it is recommended to see `--help` since it contains important information regarding the program.
+Example for _lstm_ model training on _sigma_ dataset with (previous) discharge (as previous input):
+
+```bash
+python multirun.py --config-name lstm -m dataset=sigma discharge=true gpu=0 experiment_name=lstm41_d_seed
+```
+
+Note it is recommended to see `--help` since it contains important information regarding the program. Flag `-m` indicates to sequentially run jobs specified by hypdra sweeper in each model file config.
 
 
 ## Evaluation 
