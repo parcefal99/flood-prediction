@@ -2,20 +2,13 @@
 
 ## Structure
 
-- `conf` contains the configuration files for specific models. The attributes were taken from [here](https://neuralhydrology.readthedocs.io/en/latest/usage/config.html).
+- `conf` contains the configuration files for specific models and datasets as well as the base config, which is common for all the models. The attributes were taken from [here](https://neuralhydrology.readthedocs.io/en/latest/usage/config.html).
 - `eval.py` evaluate a model
-- `basins_sigma_51.txt` contains a list of basins on which to train models
-- `finetune_basin.txt` contains a list of bains on which to finetune models
-- `multirun.py` training script
+- `basins` contains files of lists of basins onto which to train models
+- `multirun.py` training script that supports Grid Search
 - `hindcast.py` script to plot observed vs predicted values
 
 ## Training
-
-To see info about the program and available options execute the script with `-h` (or `--help`) flag:
-
-```bash
-python multirun.py -h
-```
 
 To run the training execute:
 
@@ -34,7 +27,7 @@ Note it is recommended to see `--help` since it contains important information r
 
 ## Evaluation 
 
-After training evaluation is necessary, hence you should run:
+After training, if you need to evaluate the model again, you should run:
 
 ```bash
 python eval.py --run_dir /path/to/run --epoch EPOCH --gpu GPU

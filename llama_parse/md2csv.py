@@ -44,7 +44,7 @@ class Message(Enum):
 
 def main() -> None:
     # get all parsed files
-    basins_path = Path("../data/report_tables_splitted/markdown/top/")
+    basins_path = Path("../data/yearbooks_collection/markdown/")
     basins = sorted(list(basins_path.rglob("*.md")))
     # set output directory
     output_dir = Path("./output")
@@ -200,7 +200,7 @@ def get_markdown(filepath) -> str:
 
 
 def merge_basins(output_dir: Path) -> list:
-    basins = get_basins("./basins_106.txt")
+    basins = get_basins("../ML/basins_sigma_85.txt")
 
     streamflow_path = Path("./streamflow/")
     streamflow_path.mkdir(exist_ok=True)

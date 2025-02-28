@@ -42,3 +42,18 @@ To prepare the dataset see the [dataset README file](https://github.com/LuftWaff
 # Training
 
 For training models see the [ML README file](https://github.com/LuftWaffe99/flood-prediction/tree/main/ML/README.md).
+
+
+# Project Build Steps
+
+## Dataset Collection
+
+### Streamflow Data Parsing
+
+### Basin Shapefiles
+
+In order to obtain basin shapefiles the package `delineator` was used. The coordinates of hydrological stations were sent into the delinator, which provided the shape region basins.
+
+Delineator produced shapes containg holes, which were filled in QGis.
+
+### 
