@@ -13,7 +13,7 @@ This table provides an overview of the data attributes, their definitions, and s
 
 ## Dynamic Attributes
 
-| Data Attribute        | Definition                                              | Source       |           |
+| Data Attribute        | Definition                                              | Source       |     File name      |
 |----------------------|------------------------------------------------------|-------------|-----------|
 | *t_max*            | Daily maximum air temperature [°C]                    | Era5-Land   |           |
 | *t_min*            | Daily minimum air temperature [°C]                    | Era5-Land   |           |
@@ -24,11 +24,11 @@ This table provides an overview of the data attributes, their definitions, and s
 
 ## Static Attributes
 
-| Data Attribute        | Definition                                              | Source       |           |
+| Data Attribute        | Definition                                              | Source       |   File Name        |
 |----------------------|------------------------------------------------------|-------------|-----------|
 | *elev_mean*        | Catchment mean elevation [m]                          | MERIT       |           |
 | *slope_mean*       | Catchment mean slope [m/km]                           | MERIT       |           |
-| *area_gages2*      | Catchment area [km²]                                  | MERIT       |           |
+| *area_gages2*      | Catchment area [km²]                                  | MERIT       |  area_gages2.js         |
 | *forest_frac*      | Fraction of catchment area covered by forest          | ESA         |           |
 | *lai_max*         | Maximum monthly mean of leaf area index                | MODIS       |           |
 | *lai_diff*        | Difference between maximum and minimum monthly mean leaf area index | MODIS       |           |
@@ -39,8 +39,8 @@ This table provides an overview of the data attributes, their definitions, and s
 | *sand_frac*       | Fraction of sand in the soil [%]                        | SoilGrids-ISRIC |           |
 | *silt_frac*       | Fraction of silt in the soil [%]                        | SoilGrids-ISRIC |           |
 | *clay_frac*       | Fraction of clay in the soil [%]                        | SoilGrids-ISRIC |           |
-| *p_mean*          | Mean daily precipitation [mm/day]                       | Era5-Land   |           |
-| *pet_mean*        | Mean daily potential evapotranspiration [mm/day]        | MODIS       |           |
+| *p_mean*          | Mean daily precipitation [mm/day]                       | Era5-Land   |  p_mean.js         |
+| *pet_mean*        | Mean daily potential evapotranspiration [mm/day]        | MODIS       |  pet_mean.js         |
 | *aridity*         | Ratio of mean PET to mean precipitation                 | MODIS       |           |
 | *p_seasonality*   | Estimated by representing annual precipitation and temperature as sine waves | Era5-Land   |           |
 | *frac_snow_daily* | Fraction of precipitation falling on days with temp < 0°C | Era5-Land   |           |
