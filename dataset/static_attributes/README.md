@@ -1,6 +1,6 @@
-#1. GEE Scripts.
+# 1. GEE Scripts.
 
-##1.1 Data Attributes Table
+## 1.1 Data Attributes Table
 ## 5 dynamic and 22 static attributes were computed based on the guidelines in Krazert et al(2019b). 
 (While 27 static attributes were used in Kratzert et al. (2019b), five attributes, such as depth to bedrock, soil depth,
 soil porosity, carbonate rocks fraction, and geological permeability were unavailable for Northern Kazakhstan.)
