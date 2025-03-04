@@ -1,11 +1,21 @@
+'''
+This python script creates timeseries with NetCDF formatted files from the merging 
+of meteo and streamflow data (.csv files). This is due to model specifications,
+since the data is loaded only by the following format.
+
+Please define the necessary directories, where the meteo and streamflow data is located, 
+and use the script as follows:
+    python convert_to_nc.py 
+'''
+
 import os
 import pandas as pd
 import xarray as xr
 
 # Define directories
-dir1 = 'C:\\Users\\User\\Desktop\\omega_dataset\\mean_basin_forcing'  # Directory with left-side CSV files
-dir2 = 'C:\\Users\\User\\Desktop\\omega_dataset\\streamflow'  # Directory with right-side CSV files
-output_dir = 'C:\\Users\\User\\Desktop\\omega_dataset\\time_series'  # Directory to save .nc files
+dir1 = ''  # Directory with (left-side) meteo data files
+dir2 = ''  # Directory with (right-side) streamflow data files
+output_dir = ''  # Directory to save .nc files
 
 # Ensure output directory exists
 os.makedirs(output_dir, exist_ok=True)
@@ -25,16 +35,15 @@ for filename in os.listdir(dir1):
             df1 = pd.read_csv(file1_path)
             df2 = pd.read_csv(file2_path)
 
-            # # Ensure 'date' is parsed as datetime for both dataframes
-            # df1['vp1'] = df1['vp1'] * 1000
-            # df1['vp2'] = df1['vp2'] * 1000
+            # Ensure 'date' is parsed as datetime for both dataframes
             df1["date"] = pd.to_datetime(df1["date"])
             df2['date'] = pd.to_datetime(df2['date'])
-            df1 = df1.set_index("date")
+            # df1 = df1.set_index("date")
 
             # Perform left-side merge on 'date' column
             merged_df = pd.merge(df1, df2, on='date', how='left')
             merged_df = merged_df.set_index('date')
+
             # Convert the merged DataFrame to xarray.Dataset
             ds = xr.Dataset.from_dataframe(merged_df)
 
