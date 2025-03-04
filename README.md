@@ -36,12 +36,14 @@ Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 
 # Data
 
-To prepare the dataset see the [Dataset README file](./dataset/README.md).
+To prepare the dataset see the Dataset [README](./dataset/README.md) file.
 
 
 # Training
 
-For training models see the [ML README file](./ML/README.md).
+[NeuralHydrology](https://github.com/neuralhydrology/neuralhydrology) library is used underneath this repo. Directory [ML](./ML/) contains training, evaluation, finetuning and other scripts related to ML models.
+
+For details, see the ML [README](./ML/README.md) file.
 
 
 # Project Build Steps
@@ -68,3 +70,7 @@ Delineator produced shapes containg holes, they were filled in QGis.
 
 ### Extracting Data from Google Earth Engine
 
+
+### Data Availability
+
+Notebook [plot_data_discharge.ipynb](./dataset/plot_data_discharge.ipynb) can be used to draw the streamflow data availability of all the specified basins in the dataset.
