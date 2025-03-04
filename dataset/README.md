@@ -1,31 +1,33 @@
 # Dataset Preparation
 
-## Setup
+## Dynamic and Static Features
 
-Following this section read `/conf/config.yaml` if you get an error or some unexpected result.
+Upload the shapefiles to Google Earth Engine and use the following `.js` scripts to obtain raw meteo data (from ERA5) and catchment attributes (with global datasets specified):
+- Dynamic features:
+    - `era5.js`
+- Static features: 
+    - `area_gages2.js`
+    - `elev_mean.js`
+    - `forest_frac.js`
+    - `gvf_max_diff.js`
+    - `lai_max_diff.js`
+    - `max_water_content.js`
+    - `pet_mean.js`
+    - `sand_silt_clay.js`
+    - `soil_conductivity.js`
 
-- Create `/data` directory
-- Copy or parse KazHydroMet data into `/data/kazhydromet` directory (`meteo` data has ot be called `basin_forcing` and `hydro` data has to be called `streamflow`)
-- Copy `selected_basins.csv` into `/data` directory
 
-### Google Earth Engine Data
+## Streamflow 
 
-Create `/data/GEE` directory and place all GEE attribute files inside
+There are two options: Web Portal and PDF Yearbooks (both from KazHydroMet). The former could be accessed using the [web_parser_meteo.py](./kazhydromet_parser/web_parser_meteo.py), which obtains meteo data from all basins of Kazakhstan. The latter is parsed using LlamaParse, check [llama_parse](../llama_parse/) for detailed information with our codes.
 
-## Dataset
+## Preprocessing 
 
-To prepare the dataset run:
+Use the following scripts - [raw_to_fancy.ipynb](./raw_to_fancy.ipynb) and [static_clim.ipynb](./gee_scripts/preprocessing_clim/static_clim.ipynb) - to obtain dataset for multiple basins in .csv format.
 
-```bash
-python pipeline.py
-```
+Note that streamflow values should be normalized by the area of subsequent basin. Check this script [streamflow_normalization.ipynb](./streamflow_normalization.ipynb).
 
-This script will create `/data/CAMELS_KZ` dataset directory with the following structure:
+## NetCDF 
 
-- `CAMELS_KZ`
-    - `attributes` (contains static attributes split into multiple files)
-    - `mean_basin_forcing`
-    - `streamflow` 
-    - `time_series` (`.nc` files of combined dynamic attributes of meteo and hydro data)
-
-Files contained in `time_series` are the end files used for training the models.
+To access the NeuralHydrology models and start training, the dataset should create `timeseries` in NetCDF format, which is essentially concatenation of dynamic/static features and streamflow data. Files contained in `time_series` are the end files used for training the models.
+The script is available here - [convert_to_nc.py](./convert_to_nc.py). 

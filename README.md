@@ -68,3 +68,7 @@ Delineator produced shapes containg holes, which were filled in QGis.
 
 ### Extracting Data from Google Earth Engine
 
+Google Earth Engine (GEE) is a cloud-based platform for processing and analyzing large-scale geospatial data. It provides access to extensive satellite imagery and geospatial datasets, allowing users to perform advanced environmental and earth science analyses using JavaScript or Python APIs.
+
+In order to obtain the meteorological forcings and catchment attributes, upload the basin shapefiles ([link](https://huggingface.co/datasets/floodpeople/sigma_dataset)) to GEE platform and start extracting the features using the guidelines stated [there](./dataset/README.md). Dynamic features (meteo) are obtained from ERA5_LAND dataset, and  static features are from MODIS, MERIT, ESA, HiHydroSoilv2_0, soilgrids-isric datasets using Google Earth Engine.
+ 
