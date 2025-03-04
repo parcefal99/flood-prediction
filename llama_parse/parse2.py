@@ -1,4 +1,3 @@
-import os
 import argparse
 from pathlib import Path
 
@@ -9,7 +8,7 @@ from dotenv import load_dotenv
 from llama_parse import LlamaParse
 
 
-load_dotenv()
+load_dotenv(dotenv_path="../.env")
 
 # ==== Arguments ====
 parser = argparse.ArgumentParser()
@@ -26,7 +25,7 @@ args = parser.parse_args()
 # ==== Directories ====
 output_dir = Path("./output")
 
-df = pd.read_csv(f"../data/batch_split/{str(args.input)}", sep=";")
+df = pd.read_csv(str(args.input), sep=";")
 
 
 # ==== Parsing ====
@@ -54,7 +53,7 @@ with tqdm(
         _file = row["path"]
         document = parser.load_data(_file)
 
-        _output_dir = output_dir / row['part'] / str(row['batch'])
+        _output_dir = output_dir / row["part"] / str(row["batch"])
         filename = f"{Path(_file).name.split('.')[0]}.md"
 
         output_file = _output_dir / filename

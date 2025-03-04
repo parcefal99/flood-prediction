@@ -15,7 +15,7 @@ Create a python virtual environment to install all the necessary packages:
 python -m venv .venv
 ```
 
-or
+Alternatively, you can use conda:
 
 ```bash
 conda create -n flood_proj python=3.10.12
@@ -56,14 +56,14 @@ The collection of the data was performed in several steps from serveral sources.
 
 The web-parser script automates the extraction of streamflow data from the [KazHydroMet Web Portal](http://ecodata.kz:3838/app_hydro_en/) using Selenium. It navigates the portal, retrieves a list of hydrological posts, and downloads discharge data for each hydropost, saving it as CSV files in a structured directory. The script handles Cyrillic-to-Latin transliteration, cleans data by converting special characters and non-numeric entries (e.g., "нб" to "0", "-" to NaN), and ensures consistent formatting. The script includes error handling for timeouts and stale elements, with a retry mechanism to resume from the last processed station. To run, users should ensure a stable internet connection and adjust the script's timing parameters if needed to accommodate network or server response variations. The output provides a comprehensive list of CSV files of discharge records, ready for further steps. See [KazHydroMet Parser](./dataset/kazhydromet_parser/).
 
-The streamflow data from KazHydroMet portal was in question, therefore, our team parsed PDF annual yearbooks provided by KazHydroMet. For that [llama_parse](https://www.llamaindex.ai/llamaparse) service was utilized. The parsed data were obtained on Markdown format, which were converted in CSV files, and merged after. See [llama_parse](./llama_parse/) folder.
+The streamflow data from KazHydroMet portal was in question, therefore, our team parsed PDF annual yearbooks provided by KazHydroMet. For that [llama_parse](https://www.llamaindex.ai/llamaparse) service was utilized. The parsed data were obtained in the `Markdown` format, later converted into `CSV` files, and merged after. See [llama_parse](./llama_parse/) folder.
 
 
 ### Basin Shapefiles
 
-In order to obtain basin shapefiles the package [delineator](https://github.com/mheberger/delineator) was used. The coordinates of hydrological stations were sent into this package, which provided the shape region basins.
+In order to obtain basin shapefiles the package [delineator](https://github.com/mheberger/delineator) was used. The coordinates of hydrological stations were provided to this package, which determined the basin shapes.
 
-Delineator produced shapes containg holes, which were filled in QGis.
+Delineator produced shapes containg holes, they were filled in QGis.
 
 
 ### Extracting Data from Google Earth Engine

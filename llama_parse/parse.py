@@ -15,13 +15,6 @@ load_dotenv(dotenv_path="../.env")
 # ==== Arguments ====
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--part",
-    "-p",
-    help="Specify part of the document to parse",
-    type=str,
-    choices=["top", "bottom"],
-)
-parser.add_argument(
     "--batch",
     "-b",
     help="Specify batch to parse",
@@ -32,25 +25,16 @@ args = parser.parse_args()
 
 
 # ==== Directories ====
-data_dir = Path("./data/report_tables_cropped")
-table_dirs = ["tables_1_3_top", "tables_1_3_bottom"]
-
-if str(args.part) == "top":
-    data_part_dir = data_dir / table_dirs[0]
-else:
-    data_part_dir = data_dir / table_dirs[1]
+data_dir = Path("./data/annual_reports/pdf")
 
 output_dir = Path("./output")
 if not output_dir.exists():
     output_dir.mkdir()
 
-output_dir_part = output_dir / str(args.part)
-output_dir_part.mkdir(exist_ok=True)
-
-output_dir = output_dir_part / str(args.batch)
+output_dir = output_dir / str(args.batch)
 output_dir.mkdir(exist_ok=True)
 
-df = pd.read_csv(f"./data/batch_split/{str(args.part)}/{str(args.batch)}.csv")
+df = pd.read_csv(data_dir / f"batch_split/{str(args.batch)}.csv")
 grouping_key = df.index // 10
 grouped = df.groupby(grouping_key)
 
@@ -71,12 +55,12 @@ with tqdm(
     desc=f"{str(args.part).capitalize()}-Batch-{str(args.batch)}",
     unit="group",
 ) as pbar_outer:
-    # Iterate over each group
+    # iterate over each group
     for group_name, group_df in grouped:
-        # Display the group name in the outer progress bar
+        # display the group name in the outer progress bar
         pbar_outer.set_postfix({"Group": group_name})
 
-        _files = group_df["paths"].values.tolist()
+        _files = group_df["path"].values.tolist()
         dir_parser = SimpleDirectoryReader(
             input_files=_files, file_extractor=file_extractor
         )

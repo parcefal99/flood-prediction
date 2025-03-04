@@ -175,14 +175,14 @@ def parse_basin(filepath: Path, year) -> tuple[pd.DataFrame, Message]:
     discharge = []
     dates = []
 
-    # Iterate over columns to append them in order
+    # iterate over columns to append them in order
     for month in df.columns:
         _df = df[month]
         discharge.extend(_df)
         date = [f"{year}-{month}-{day}" for day in _df.index]
         dates.extend(date)
 
-    # Create a new DataFrame with the extended column
+    # create a new DataFrame with the extended column
     df = pd.DataFrame({"date": dates, "discharge": discharge})
     df = df[~(df["discharge"] == "-1")]
     df.loc[:, "discharge"] = df["discharge"].replace("-", np.nan)
@@ -219,7 +219,6 @@ def merge_basins(output_dir: Path) -> list:
 
         df = None
         for j, file in enumerate(basins_by_year):
-            # print(file.name)
             _df = pd.read_csv(file, sep=";")
             _df["date"] = pd.to_datetime(_df["date"])
             _df.set_index("date", inplace=True)
@@ -261,23 +260,23 @@ def is_growing_sequence(arr: list) -> bool:
 
 
 def extract_month_numbers(markdown_text):
-    # Find all rows that might contain month numbers
+    # find all rows that might contain month numbers
     rows = markdown_text.strip().split("\n")
     header_row = None
 
-    # Identify the row with month numbers
+    # identify the row with month numbers
     for row in rows:
         if re.search(
             r"\|\s*\d+\s*\|", row
-        ):  # Look for a row containing digits between '|'
+        ):  # look for a row containing digits between '|'
             header_row = row
             break
 
     if not header_row:
         return []
 
-    # Extract the numbers from the identified header row
-    month_pattern = r"\b\d{1,2}\b"  # Matches one or two digit numbers
+    # extract the numbers from the identified header row
+    month_pattern = r"\b\d{1,2}\b"  # matches one or two digit numbers
     month_numbers = re.findall(month_pattern, header_row)
     return [int(month) for month in month_numbers]
 
