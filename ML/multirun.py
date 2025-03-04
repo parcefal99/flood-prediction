@@ -22,7 +22,7 @@ LOGGER = logging.getLogger(__name__)
 @hydra.main(config_name=None, config_path="conf/models", version_base=None)
 def run(cfg: DictConfig) -> None:
 
-    load_dotenv(dotenv_path=".env")
+    load_dotenv(dotenv_path="../.env")
 
     # check if CUDA available
     if torch.cuda.is_available():

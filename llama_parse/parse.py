@@ -10,7 +10,7 @@ from llama_parse import LlamaParse
 from llama_index.core import SimpleDirectoryReader
 
 
-load_dotenv()
+load_dotenv(dotenv_path="../.env")
 
 # ==== Arguments ====
 parser = argparse.ArgumentParser()

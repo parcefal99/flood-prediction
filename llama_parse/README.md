@@ -2,7 +2,7 @@
 
 ## Setup
 
-Create `.env` file in this directory and add `LLAMA_CLOUD_API_KEY` entry.
+Add `LLAMA_CLOUD_API_KEY` entry inside `.env` file in the project's root. Create it if it doesn't exist.
 
 ## Tables Extraction
 

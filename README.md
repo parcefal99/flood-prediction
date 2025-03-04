@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## WandB Logging
 
-Create `.env` file in `/ML` and add `WANDB_ENTITY` entry.
+Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 
 
 # Data
