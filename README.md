@@ -36,7 +36,7 @@ Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 
 # Data
 
-To prepare the dataset see the Dataset [README](./dataset/README.md) file.
+To prepare the dataset see the Dataset [README](./dataset/README.md) file. Another option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `sigma_dataset.zip`. 
 
 
 # Training
