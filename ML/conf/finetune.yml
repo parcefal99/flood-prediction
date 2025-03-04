@@ -1,0 +1,44 @@
+# --- Experiment configurations --------------------------------------------------------------------
+
+# experiment name, used as folder name
+experiment_name: finetune
+
+# files to specify training, validation and test basins (relative to code root or absolute path)
+train_basin_file: basins_sigma_41.txt
+validation_basin_file: basins_sigma_41.txt
+test_basin_file: basins_sigma_41.txt
+
+# training, validation and test time periods (format = 'dd/mm/yyyy')
+train_start_date: '01/01/2000'
+train_end_date: '31/12/2016'
+validation_start_date: '01/01/2017'
+validation_end_date: '31/12/2018'
+test_start_date: '01/01/2019'
+test_end_date: '31/12/2021'
+
+# --- Validation configuration ---------------------------------------------------------------------
+
+# specify how many random basins to use for validation
+validate_n_random_basins: 41
+
+# --- Training configuration -----------------------------------------------------------------------
+
+# specify learning rates to use starting at specific epochs (0 is the initial learning rate)
+learning_rate:
+    0: 1e-2
+    5: 1e-3
+    10: 1e-4
+
+# Number of training epochs
+epochs: 20
+
+# --- Data configurations --------------------------------------------------------------------------
+
+# Path to the dataset
+data_dir: ../data/sigma_dataset
+
+# if modules are specified, only this configuration will be used. Otherwise, all possible combinations are tested.
+# finetune_modules:
+# - head
+# - input_gate
+# - dynamic_gates

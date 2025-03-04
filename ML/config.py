@@ -303,6 +303,10 @@ class Config(object):
     def clip_targets_to_zero(self) -> List[str]:
         return self._as_default_list(self._cfg.get("clip_targets_to_zero", []))
 
+    @clip_targets_to_zero.setter
+    def clip_targets_to_zero(self, clip_list: List[str]):
+        self._cfg["clip_targets_to_zero"] = clip_list
+
     @property
     def continue_from_epoch(self) -> int:
         return self._cfg.get("continue_from_epoch", None)
@@ -314,6 +318,10 @@ class Config(object):
     @property
     def data_dir(self) -> Path:
         return self._get_value_verbose("data_dir")
+    
+    @data_dir.setter
+    def data_dir(self, folder: Path):
+        self._cfg["data_dir"] = folder
 
     @property
     def dataset(self) -> str:
@@ -367,6 +375,10 @@ class Config(object):
     @property
     def epochs(self) -> int:
         return self._get_value_verbose("epochs")
+    
+    @epochs.setter
+    def epochs(self, epoch_nbr: int):
+        self._cfg["epochs"] = epoch_nbr
 
     @property
     def evolving_attributes(self) -> List[str]:
@@ -384,6 +396,10 @@ class Config(object):
             return "run"
         else:
             return self._cfg["experiment_name"]
+        
+    @experiment_name.setter
+    def experiment_name(self, name: str):
+        self._cfg["experiment_name"] = name
 
     @property
     def finetune_modules(self) -> Union[List[str], Dict[str, str]]:
@@ -507,6 +523,10 @@ class Config(object):
                 raise ValueError("Unsupported data type for learning rate. Use either dict (epoch to float) or float.")
         else:
             raise ValueError("No learning rate specified in the config (.yml).")
+
+    @learning_rate.setter
+    def learning_rate(self, lr: Dict[int, float]):
+        self._cfg["learning_rate"] = lr
 
     @property
     def log_interval(self) -> int:
@@ -713,10 +733,10 @@ class Config(object):
 
     @seed.setter
     def seed(self, seed: int):
-        if self._cfg.get("seed", None) is None:
-            self._cfg["seed"] = seed
-        else:
-            raise RuntimeError("Seed was already specified and can't be replaced")
+        # if self._cfg.get("seed", None) is None:
+        self._cfg["seed"] = seed
+        # else:
+        #     raise RuntimeError("Seed was already specified and can't be replaced")
 
     @property
     def seq_length(self) -> Union[int, Dict[str, int]]:
@@ -777,14 +797,26 @@ class Config(object):
     @property
     def test_basin_file(self) -> Path:
         return self._get_value_verbose("test_basin_file")
+    
+    @test_basin_file.setter
+    def test_basin_file(self, file: Path):
+        self._cfg["test_basin_file"] = file
 
     @property
     def test_end_date(self) -> pd.Timestamp:
         return self._get_value_verbose("test_end_date")
 
+    @test_end_date.setter
+    def test_end_date(self, date: str):
+        self._cfg["test_end_date"] = date
+
     @property
     def test_start_date(self) -> pd.Timestamp:
         return self._get_value_verbose("test_start_date")
+
+    @test_start_date.setter
+    def test_start_date(self, date: str):
+        self._cfg["test_start_date"] = date
 
     @property
     def timestep_counter(self) -> bool:
@@ -793,6 +825,10 @@ class Config(object):
     @property
     def train_basin_file(self) -> Path:
         return self._get_value_verbose("train_basin_file")
+    
+    @train_basin_file.setter
+    def train_basin_file(self, file: Path):
+        self._cfg["train_basin_file"] = file
 
     @property
     def train_data_file(self) -> Path:
@@ -810,9 +846,17 @@ class Config(object):
     def train_end_date(self) -> pd.Timestamp:
         return self._get_value_verbose("train_end_date")
 
+    @train_end_date.setter
+    def train_end_date(self, date: str):
+        self._cfg["train_end_date"] = date
+
     @property
     def train_start_date(self) -> pd.Timestamp:
         return self._get_value_verbose("train_start_date")
+
+    @train_start_date.setter
+    def train_start_date(self, date: str):
+        self._cfg["train_start_date"] = date
 
     @property
     def transfer_mtslstm_states(self) -> Dict[str, str]:
@@ -851,14 +895,26 @@ class Config(object):
     @property
     def validation_basin_file(self) -> Path:
         return self._get_value_verbose("validation_basin_file")
+    
+    @validation_basin_file.setter
+    def validation_basin_file(self, file: Path):
+        self._cfg["validation_basin_file"] = file
 
     @property
     def validation_end_date(self) -> pd.Timestamp:
         return self._get_value_verbose("validation_end_date")
 
+    @validation_end_date.setter
+    def validation_end_date(self, date: str):
+        self._cfg["validation_end_date"] = date
+
     @property
     def validation_start_date(self) -> pd.Timestamp:
         return self._get_value_verbose("validation_start_date")
+
+    @validation_start_date.setter
+    def validation_start_date(self, date: str):
+        self._cfg["validation_start_date"] = date
 
     @property
     def verbose(self) -> int:
