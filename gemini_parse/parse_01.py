@@ -10,7 +10,7 @@ import pandas as pd
 
 # load the api key from the .env file
 load_dotenv()
-api_key = os.getenv("GOOGLE_API_KEY")
+api_key = os.getenv("issai_api_key")
 client = genai.Client(api_key=api_key)
 
 # ==== Arguments ====
@@ -28,7 +28,7 @@ args = parser.parse_args()
 # ==== Directories ====
 data_dir = Path("../gemini_parse/tables_1_3")
 
-output_dir = Path('../gemini_parse/output')
+output_dir = Path('../gemini_parse/output_issai_pro')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
@@ -54,11 +54,18 @@ with tqdm(
         with open(filepath, "rb") as f:
             pdf_file = f.read()
             filename = filepath.split("\\")[-1].split(".")[0]
-            
+        
+        first_check = filename + ".md"
+        # check if the file already exists
+        if os.path.exists(os.path.join(output_dir, first_check)):
+            pbar_outer.set_postfix({"status": "skipped"})
+            print(f"File {first_check} already exists. Skipping...")
+            continue
+
         # generate the content
-        prompt = "This is a page from a PDF document. Extract all text content while preserving the structure. Pay special attention to tables, columns, headers, and any structured content. Maintain paragraph breaks and formatting. Extract the text correctly and avoid any errors."
+        prompt = "Parse this pdf into a markdown file." 
         response = client.models._generate_content(
-            model="gemini-2.5-pro-exp-03-25", 
+            model="gemini-2.5-pro-preview-05-06", 
             contents=[
                 types.Part.from_bytes(
                     data=pdf_file,
