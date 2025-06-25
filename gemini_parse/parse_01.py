@@ -20,22 +20,28 @@ parser.add_argument(
     "-b",
     help="Specify batch to parse",
     type=int,
-    choices=[1, 2, 3, 4, 5, 6],
+    choices=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
 )
 args = parser.parse_args()
 
 
 # ==== Directories ====
-data_dir = Path("../gemini_parse/tables_1_3")
+data_dir = Path("../gemini_parse/uncropped_95")
 
-output_dir = Path('../gemini_parse/output_issai_pro')
+output_dir = Path('../gemini_parse/output')
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 output_dir = output_dir / str(args.batch)
 output_dir.mkdir(exist_ok=True)
 
-df = pd.read_csv(f"batch_files/{str(args.batch)}.csv")
+if (args.batch < 1) or (args.batch > 11):
+    raise ValueError("Batch number must be between 1 and 11.")
+elif args.batch == 11:
+    # batch 11 is a special case, it contains all the files
+    df = pd.read_csv("batch_files/uncropped.csv")
+else:
+    df = pd.read_csv(f"batch_files/{str(args.batch)}.csv")
 _files = df["path"].values.tolist()
 
 
@@ -51,21 +57,26 @@ with tqdm(
         pbar_outer.set_description(f"Processing {filepath}")
         pbar_outer.update(1)
 
-        with open(filepath, "rb") as f:
+        # with open(filepath, "rb") as f:
+        #     pdf_file = f.read()
+        #     filename = filepath.split("/")[-1].split(".")[0]
+
+        with open("../gemini_parse/uncropped_95/" + filepath, "rb") as f:
             pdf_file = f.read()
-            filename = filepath.split("\\")[-1].split(".")[0]
+            filename = filepath.split(".")[0]
         
+
         first_check = filename + ".md"
         # check if the file already exists
         if os.path.exists(os.path.join(output_dir, first_check)):
             pbar_outer.set_postfix({"status": "skipped"})
-            print(f"File {first_check} already exists. Skipping...")
+            # print(f"File {first_check} already exists. Skipping...")
             continue
 
         # generate the content
-        prompt = "Parse this pdf into a markdown file." 
+        prompt = """Parse this pdf into a markdown file. Parse until the word <декада> is found. Make the tabular data in the pdf into a markdown table. Please do the values as correct as possible, parse them as you see.""" 
         response = client.models._generate_content(
-            model="gemini-2.5-pro-preview-05-06", 
+            model="gemini-2.5-pro-preview-06-05", 
             contents=[
                 types.Part.from_bytes(
                     data=pdf_file,
