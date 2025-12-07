@@ -5,7 +5,7 @@ Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning 
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
-![GEE](https://img.shields.io/badge/Google%20Earth%20Engine-GEE-4285F4?style=for-the-badge&logo=googleearth&logoColor=white)
+![GEE](https://img.shields.io/badge/%20-8B4513?style=for-the-badge&logo=googleearth&logoColor=white&label=Google%20Earth%20Engine&labelColor=8B4513)
 ![NeuralHydrology](https://img.shields.io/badge/NeuralHydrology-Model-blue?style=for-the-badge)
 
 # Description
@@ -53,7 +53,26 @@ Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 
 # Data
 
-To prepare the dataset see the Dataset [README](./dataset/README.md) file. Another option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `sigma_dataset.zip`. 
+This dataset consists of meteorological (time series) and geophysical (catchment attributes) data of 85 basins in Kazakhstan. It is intended for use in weather forecasting or modeling, as well as flood prediction based on the attributes provided.
+
+We developed basin-scale hydrometeorological forcing data for 85 basins in the conterminous Kazakhstan basin subset. Retrospective model forcings are computed from ERA5-Land forcing data run from 1 Jan 2000 to 31 Dec 2022. Model time series output is available for the same time periods as the forcing data.
+
+
+| ID     | Latitude  | Longitude  | Location |
+|--------|----------|-----------|--------------------------------|
+| 11001  | 48.004531  | 85.222161  | с.Боран |
+| 11063  | 48.434364  | 85.838581  | Теректы  с. Мойылды (Николаевка) |
+| 11068  | 48.133153  | 85.196547  | с.Калжыр |
+| 11077  | 47.283392  | 84.106714  | с.Сарыолен |
+| 11094  | 49.009844  | 82.788169  | с. Джумба |
+| 11108  | 48.606183  | 83.869081  | с. Вознесенка |
+| 11117  | 49.206781  | 84.517825  | с.Улькен Нарын |
+| 11124  | 49.365844  | 86.448403  | с. Берель |
+| 11126  | 49.331689  | 85.171111  | с. Печи (с.Барлык) |
+...   
+
+
+To prepare the dataset see the Dataset [README](./dataset/README.md) file. Another (faster) option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `KazFlow85_dataset.zip`. 
 
 
 # Training
