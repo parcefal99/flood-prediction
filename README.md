@@ -5,8 +5,8 @@ Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning 
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
-![GEE](https://img.shields.io/badge/%20-8B4513?style=for-the-badge&logo=googleearth&logoColor=white&label=Google%20Earth%20Engine&labelColor=8B4513)
 ![NeuralHydrology](https://img.shields.io/badge/NeuralHydrology-Model-blue?style=for-the-badge)
+![GEE](https://img.shields.io/badge/-white?style=for-the-badge&logo=googleearth&logoColor=white&label=Google%20Earth%20Engine&labelColor=A0522D)
 
 # Description
 
@@ -21,34 +21,6 @@ This dataset constitutes a **novel scientific contribution** in several respects
 * It provides the **first publicly available, ML-ready hydrological dataset for Kazakhstan**, integrating national in-situ observations with static and gridded global data sources.
 * It facilitates the application of contemporary rainfall–runoff modeling approaches, especially deep learning–based flood forecasting, in a region that has historically lacked such computational resources.
 * It establishes a foundation for further research on hydrological extremes, operational early-warning systems, and sustainable water-resources planning in Central Asia, expanding the scope of machine-learning hydrology into an underrepresented geographic setting.
-
-# Setup
-
-## Virtual environment
-
-Create a python virtual environment to install all the necessary packages:
-
-```bash
-python -m venv .venv
-```
-
-Alternatively, you can use conda:
-
-```bash
-conda create -n flood_proj python=3.10.12
-```
-
-## Installation
-
-Install the required packages into the created virtual environment
-
-```bash
-pip install -r requirements.txt
-```
-
-## WandB Logging
-
-Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 
 
 # Data
@@ -66,20 +38,10 @@ We developed basin-scale hydrometeorological forcing data for 85 basins in the c
 | 11077  | 47.283392  | 84.106714  | с.Сарыолен |
 | 11094  | 49.009844  | 82.788169  | с. Джумба |
 | 11108  | 48.606183  | 83.869081  | с. Вознесенка |
-| 11117  | 49.206781  | 84.517825  | с.Улькен Нарын |
-| 11124  | 49.365844  | 86.448403  | с. Берель |
-| 11126  | 49.331689  | 85.171111  | с. Печи (с.Барлык) |
 ...   
 
 
-To prepare the dataset see the Dataset [README](./dataset/README.md) file. Another (faster) option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `KazFlow85_dataset.zip`. 
-
-
-# Training
-
-[NeuralHydrology](https://github.com/neuralhydrology/neuralhydrology) library is used underneath this repo. Directory [ML](./ML/) contains training, evaluation, finetuning and other scripts related to ML models.
-
-For details, see the ML [README](./ML/README.md) file.
+To prepare the full dataset see the Dataset [README](./dataset/README.md) file. Another (faster) option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `KazFlow85_dataset.zip`. 
 
 
 # Project Build Steps
@@ -114,3 +76,39 @@ In order to obtain the meteorological forcings and catchment attributes, upload 
 ### Data Availability
 
 Notebook [plot_data_discharge.ipynb](./dataset/plot_data_discharge.ipynb) can be used to draw the streamflow data availability of all the specified basins in the dataset.
+
+
+# Setup
+
+## Virtual environment
+
+Create a python virtual environment to install all the necessary packages:
+
+```bash
+python -m venv .venv
+```
+
+Alternatively, you can use conda:
+
+```bash
+conda create -n flood_proj python=3.10.12
+```
+
+## Installation
+
+Install the required packages into the created virtual environment
+
+```bash
+pip install -r requirements.txt
+```
+
+## WandB Logging
+
+Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
+
+
+# Training
+
+[NeuralHydrology](https://github.com/neuralhydrology/neuralhydrology) library is used underneath this repo. Directory [ML](./ML/) contains training, evaluation, finetuning and other scripts related to ML models.
+
+For details, see the ML [README](./ML/README.md) file.
