@@ -3,7 +3,6 @@
 Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning approaches.
 
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python)
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
 ![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)
 ![GEE](https://img.shields.io/badge/Google%20Earth%20Engine-GEE-4285F4?style=for-the-badge&logo=googleearth&logoColor=white)
@@ -11,12 +10,11 @@ Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning 
 
 # Description
 
-Flooding constitutes a major hydrometeorological risk across numerous regions of Kazakhstan, yet there is currently **no publicly accessible, machine-learning–ready hydrological dataset or flood-prediction system** developed specifically for the country’s river basins. This repository addresses this gap by assembling, harmonizing, and structuring a multi-source dataset that integrates streamflow observations, meteorological forcings, soil and land-cover information, and catchment characteristics for several basins within Kazakhstan. The resulting resource represents the **first machine-learning hydrology dataset tailored to the Kazakh context**, thereby enabling data-driven flood-forecasting research in a region where such tools have not previously been available.
+Flooding constitutes a major hydro-meteorological risk across numerous regions of Kazakhstan, yet there is currently **no publicly accessible, ML-ready hydrological dataset or flood-prediction system** developed specifically for the country’s river basins. This repository addresses this gap by assembling, harmonizing, and structuring a multi-source dataset that integrates streamflow observations, meteorological forcings, soil and land-cover information, and catchment characteristics for several basins within Northern Kazakhstan. The resulting resource represents the **first machine-learning hydrology dataset tailored to the Kazakh context**, thereby enabling data-driven flood-forecasting research in a region where such tools have not previously been available.
 
-The modeling workflow builds upon *NeuralHydrology*, a state-of-the-art deep learning framework for rainfall–runoff and hydrological prediction tasks (Kratzert et al., 2022). NeuralHydrology provides a modular pipeline for training LSTM-based and related architectures using simple YAML-based configuration files rather than bespoke implementations. More information on the framework is available at the project’s official page:
-[https://research.google/pubs/neuralhydrology-a-python-library-for-deep-learning-research-in-hydrology/](https://research.google/pubs/neuralhydrology-a-python-library-for-deep-learning-research-in-hydrology/)
+The modeling workflow builds upon *NeuralHydrology*, a state-of-the-art deep learning framework for rainfall–runoff and hydrological prediction tasks (Kratzert et al., 2022). NeuralHydrology provides a modular pipeline for training LSTM-based and related architectures using simple YAML-based configuration files rather than bespoke implementations. More information on the framework is available at the project’s official page: [Neural Hydrology](https://research.google/pubs/neuralhydrology-a-python-library-for-deep-learning-research-in-hydrology/)
 
-To ensure full compatibility with NeuralHydrology’s data loaders, extensive preprocessing was conducted. Local hydrological records (e.g., discharge data from KazHydroMet) were combined with catchment boundaries derived from shapefiles, and with global geospatial datasets—including satellite-derived forcings, reanalysis products, soil attributes, and land-cover classifications. These inputs were standardized, temporally aligned, and spatially aggregated following established rainfall–runoff modeling conventions.
+To ensure full compatibility with NeuralHydrology’s data loaders, extensive preprocessing was conducted. Local hydrological records (e.g., discharge data from KazHydroMet) were combined with catchment boundaries derived from shapefiles, and with global geospatial datasets, including satellite-derived forcings, reanalysis products, soil attributes, and land-cover classifications. These inputs were standardized, temporally aligned, and spatially aggregated following established rainfall–runoff modeling conventions.
 
 This dataset constitutes a **novel scientific contribution** in several respects:
 
