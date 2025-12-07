@@ -73,26 +73,7 @@ Google Earth Engine (GEE) is a cloud-based platform for processing and analyzing
 In order to obtain the meteorological forcings and catchment attributes, upload the basin shapefiles ([link](https://huggingface.co/datasets/floodpeople/sigma_dataset)) to GEE platform and start extracting the features using the guidelines stated [there](./dataset/README.md). Dynamic features (meteo) are obtained from ERA5_LAND dataset, and  static features are from MODIS, MERIT, ESA, HiHydroSoilv2_0, soilgrids-isric datasets using Google Earth Engine.
  
 
-### Data Availability
-
-#### Licensing and Use
-
-* The **processed dataset** released here is available under a **CC BY 4.0 license**, allowing reuse for research, educational, and non-commercial purposes with proper attribution.
-* **Raw data from KazHydroMet** (national hydrometeorological agency) cannot be redistributed due to licensing restrictions. Users wishing to access the original raw data should consult the KazHydroMet portal ([http://www.kazhydromet.kz/](http://www.kazhydromet.kz/)) and follow their data access procedures.
-
-#### Attribution
-
-* When using this dataset, users should **cite both sources** if applicable:
-
-  1. The **processed dataset** from this repository
-  2. The **original KazHydroMet data**, if incorporated in analyses
-
-#### Reproducibility
-
-* The repository includes **preprocessing scripts** that document how raw and global datasets were transformed into ML-ready inputs.
-* Researchers with access to the original KazHydroMet data can **reproduce the processed dataset** by following these scripts.
-* Global data sources (e.g., satellite or reanalysis products) are fully open-access and referenced in the scripts and documentation.
-
+### Streamflow Data Availability
 
 Notebook [plot_data_discharge.ipynb](./dataset/plot_data_discharge.ipynb) can be used to draw the streamflow data availability of all the specified basins in the dataset.
 
@@ -131,3 +112,24 @@ Create `.env` file in the root directory and add `WANDB_ENTITY` entry.
 [NeuralHydrology](https://github.com/neuralhydrology/neuralhydrology) library is used underneath this repo. Directory [ML](./ML/) contains training, evaluation, finetuning and other scripts related to ML models.
 
 For details, see the ML [README](./ML/README.md) file.
+
+
+# Data Availability
+
+## Licensing and Use
+
+* The **processed dataset** released here is available under a **CC BY 4.0 license**, allowing reuse for research, educational, and non-commercial purposes with proper attribution.
+* **Raw data from KazHydroMet** (national hydrometeorological agency) cannot be redistributed due to licensing restrictions. Users wishing to access the original raw data should consult the KazHydroMet portal ([http://www.kazhydromet.kz/](http://www.kazhydromet.kz/)) and follow their data access procedures.
+
+## Attribution
+
+* When using this dataset, users should **cite both sources** if applicable:
+
+  1. The **processed dataset** from this repository
+  2. The **original KazHydroMet data**, if incorporated in analyses
+
+## Reproducibility
+
+* The repository includes **preprocessing scripts** that document how raw and global datasets were transformed into ML-ready inputs.
+* Researchers with access to the original KazHydroMet data can **reproduce the processed dataset** by following these scripts.
+* Global data sources (e.g., satellite or reanalysis products) are fully open-access and referenced in the scripts and documentation.
