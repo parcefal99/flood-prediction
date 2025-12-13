@@ -1,9 +1,9 @@
-# Sigma Dataset Documentation
+# KazFlow85 Dataset Documentation
 
 ## Overview
 
 ### Dataset Name
-Sigma Dataset
+KazFlow85 Dataset
 
 ### Description
 This dataset consists of meteorological (time series) and geophysical (catchment attributes) data of 85 basins in Kazakhstan. It is intended for use in weather forecasting or modeling, as well as flood prediction based on the attributes provided.
