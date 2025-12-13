@@ -61,6 +61,13 @@ We developed basin-scale hydrometeorological forcing data for 85 basins in the c
 | 13148  | 50.254722  | 71.566667  | п.Киевка |
 | 13198  | 49.668611  | 69.550278  | п.Баршино |
 
+# Streamflow Data Availability
+
+Streamflow (discharge) observations are not uniformly available across all gauges and years. To visualize missing periods and basin coverage, use the notebook [plot_data_discharge.ipynb](./plot_data_discharge.ipynb)
+
+Below is the streamflow data availability plot for KazFlow85 basins:
+
+![Streamflow data availability](./streamflow_data_availability.png)
 
 # Dataset Preparation
 
