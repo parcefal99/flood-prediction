@@ -1,6 +1,7 @@
 # Rainfall–Runoff Modeling for Kazakhstan
 
-Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning approaches.
+Rainfall–Runoff modeling for Northern Kazakhstan using LSTMs, built on [NeuralHydrology](https://github.com/neuralhydrology/neuralhydrology), trained on a dataset combining [KazHydroMet](https://www.kazhydromet.kz/) (Kazakhstan's national hydrometeorological agency) in-situ discharge observations and satellite hydro-meteorological sources.
+
 
 ![PyTorch](https://img.shields.io/badge/PyTorch-%23EE4C2C.svg?style=for-the-badge&logo=PyTorch&logoColor=white)
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
@@ -10,7 +11,7 @@ Rainfall–Runoff Modeling for Northern Kazakhstan using LSTM and Deep Learning 
 
 # Description
 
-Flooding constitutes a major hydro-meteorological risk across numerous regions of Kazakhstan, yet there is currently **no publicly accessible, ML-ready hydrological dataset or flood-prediction system** developed specifically for the country’s river basins. This repository addresses this gap by assembling, harmonizing, and structuring a multi-source dataset that integrates streamflow observations, meteorological forcings, soil and land-cover information, and catchment characteristics for several basins within Northern Kazakhstan. The resulting resource represents the **first machine-learning hydrology dataset tailored to the Kazakh context**, thereby enabling data-driven flood-forecasting research in a region where such tools have not previously been available.
+Flooding constitutes a major hydro-meteorological risk across numerous regions of Kazakhstan, yet there is currently **no publicly accessible, ML-ready hydrological dataset or flood-prediction system** developed specifically for the country’s river basins. This repository addresses this gap by assembling and structuring a multi-source dataset that integrates streamflow observations, meteorological forcings, soil and land-cover information, and catchment characteristics for several basins within Northern Kazakhstan. The resulting resource represents the **first machine-learning hydrology dataset tailored to the Kazakh context**, thereby enabling data-driven flood-forecasting research in a region where such tools have not previously been available.
 
 The modeling workflow builds upon *NeuralHydrology*, a state-of-the-art deep learning framework for rainfall–runoff and hydrological prediction tasks (Kratzert et al., 2022). NeuralHydrology provides a modular pipeline for training LSTM-based and related architectures using simple YAML-based configuration files rather than bespoke implementations. More information on the framework is available at the project’s official page: [Neural Hydrology](https://research.google/pubs/neuralhydrology-a-python-library-for-deep-learning-research-in-hydrology/)
 
@@ -41,7 +42,7 @@ We developed basin-scale hydrometeorological forcing data for 85 basins in the c
 ...   
 
 
-To prepare the full dataset see the Dataset [README](./dataset/README.md) file. Another (faster) option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/sigma_dataset/tree/main) and check the `KazFlow85_dataset.zip`. 
+To prepare the full dataset see the Dataset [README](./dataset/README.md) file. Another (faster) option is to download the ready dataset from [HuggingFace](https://huggingface.co/datasets/floodpeople/KazFlow85_dataset/tree/main) and check the `KazFlow85_dataset.zip`. 
 
 
 # Project Build Steps
